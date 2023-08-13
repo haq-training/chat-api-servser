@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+      "preserveConstEnums": true,
+      "module": "commonjs",
+      "target": "ES6",
+      "outDir": "./dist",
+      "sourceMap": true,
+      "strict": true,
+      "esModuleInterop": true
+  },
+  "exclude": ["node_modules"],
+  "include": ["src/**/*.ts"]
+}

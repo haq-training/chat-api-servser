@@ -1,0 +1,42 @@
+version: "3.7"
+
+services:
+    mongodb:
+        image: mongo:4.4.4
+        container_name: mongodb
+        ports:
+            - "27017:27017"
+        restart: always
+        volumes:
+            - mongo-volume:/data/db
+
+    tm-redis:
+        image: redis:6.0.5
+        container_name: tm-redis
+        ports:
+            - "6378:6379"
+        restart: always
+        entrypoint:
+            - "redis-server"
+            - "--notify-keyspace-events AKE"
+
+    server:
+        build:
+            context: ./server
+            target: development
+        container_name: server
+        ports:
+            - "4000:4000"
+        restart: always
+        depends_on:
+            - redis
+            - mongodb
+        volumes:
+            - ./server/src:/app/src
+        env_file:
+            - .env
+        environment:
+            - SYNC_DATA
+
+volumes:
+    tm-mongo-volume:

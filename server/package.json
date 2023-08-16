@@ -2,20 +2,90 @@
   "name": "chat-server",
   "version": "1.0.0",
   "description": "",
-  "main": "server.ts",
+  "main": "src/server.ts",
   "scripts": {
-    "start": "nodemon --experimental-json-modules server.ts",
+    "start": "nodemon src/server.ts",
+    "build:live": "nodemon src/server.ts --ignore 'test/*'",
+    "models-gen": "sequelize-auto -h 127.0.0.1 -d chat-mysql -u admin -x training2023PDC -p 3307 --dialect mysql -o \"./src/db_models\" -l ts && npm run lint:fix-model && npm run prettier:models",
+    "prettier:models": "npm run prettier:base -- --write \"src/db_models/mysql/*.ts\"",
+    "lint:fix-model": "eslint --fix --ext .ts ./src/db_models/mysql",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
+  "devDependencies": {
+    "@graphql-codegen/cli": "1.20.0",
+    "@graphql-codegen/typescript": "1.20.0",
+    "@graphql-codegen/typescript-resolvers": "1.18.1",
+    "@types/aws-sdk": "^2.7.0",
+    "@types/bluebird": "^3.5.33",
+    "@types/crypto-js": "^4.0.1",
+    "@types/faker": "^5.1.7",
+    "@types/graphql-upload": "^8.0.6",
+    "@types/jest": "^26.0.20",
+    "@types/jsonwebtoken": "^8.5.0",
+    "@types/jwk-to-pem": "^2.0.0",
+    "@types/minio": "^7.0.9",
+    "@types/node": "^14.14.20",
+    "@types/node-fetch": "^2.6.4",
+    "@types/passport-facebook-token": "^0.4.34",
+    "@types/request": "^2.48.5",
+    "@types/sequelize": "^4.28.9",
+    "@types/uuid": "^8.3.0",
+    "@types/validator": "^13.1.2",
+    "@typescript-eslint/eslint-plugin": "^4.14.2",
+    "@typescript-eslint/parser": "^4.14.2",
+    "babel-eslint": "^10.1.0",
+    "copyfiles": "^2.4.1",
+    "eslint": "^7.20.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-babel": "^9.0.0",
+    "eslint-config-prettier": "^7.2.0",
+    "eslint-plugin-import": "^2.22.1",
+    "faker": "^5.4.0",
+    "google-auth-library": "^7.14.1",
+    "husky": "^4.3.6",
+    "import-graphql-string": "^1.0.1",
+    "jest": "^26.6.3",
+    "jwt-decode": "^3.1.2",
+    "lint-staged": "^10.5.3",
+    "nodemon": "^2.0.6",
+    "passport-google-token": "^0.1.2",
+    "prettier": "^2.2.1",
+    "ts-jest": "^26.4.4",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6"
+  },
   "dependencies": {
+    "@apollo/server": "^4.9.1",
+    "apollo-server": "^3.12.0",
     "codegen": "^0.1.0",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "express-graphql": "^0.12.0",
     "graphql": "^15.8.0",
-    "mongoose": "^7.4.2",
-    "sequelize": "^6.32.1"
+    "mongoose": "^7.4.3",
+    "mysql2": "^3.6.0",
+    "sequelize": "^6.32.1",
+    "sequelize-auto": "^0.8.8",
+    "ws": "^8.13.0"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "transform": {
+      "^.+\\.ts$": "ts-jest"
+    },
+    "globals": {
+      "ts-jest": {
+        "tsconfig": "tsconfig.json"
+      }
+    },
+    "testMatch": [
+      "**/__tests__/**/*.test.ts"
+    ],
+    "testEnvironment": "node"
   }
 }

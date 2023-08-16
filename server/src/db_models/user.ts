@@ -54,5 +54,6 @@ export class user extends Model<userAttributes> implements userAttributes {
                 ],
             }
         );
+        return user;
     }
 }

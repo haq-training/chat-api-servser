@@ -1,0 +1,34 @@
+extend type Query {
+    me: User!
+}
+
+enum Query {
+
+}
+
+type User {
+    id: Int!
+    email: String!
+    first_name: String!
+    last_name: String!
+    avatar_url: String
+    status: Int!
+    location: String
+    story: String
+    file: String
+    role: Int!
+    createdAt: Date
+    updatedAt: Date
+
+#    password: string;
+#    avatar_url?: string;
+#    first_name?: string;
+#    last_name?: string;
+#    status: number;
+#    location?: string;
+#    story?: string;
+#    file?: string;
+#    role: number;
+#    created_at?: Date;
+#    updated_at?: Date;
+}

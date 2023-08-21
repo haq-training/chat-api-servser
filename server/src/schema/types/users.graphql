@@ -1,5 +1,7 @@
 extend type Query {
     me: User!
+
+    login(input: UserLoginInput!): UserLoginResponse!
 }
 
 extend type Mutation {
@@ -32,4 +34,14 @@ input CreateUserInput {
     story: String
     avatar_url: Upload
     file: Upload
+}
+
+input UserLoginInput {
+    account: String!
+    password: String!
+}
+
+type UserLoginResponse {
+    token: String!
+    user: User!
 }

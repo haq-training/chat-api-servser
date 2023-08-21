@@ -12,15 +12,17 @@ import { ApolloServer } from '@apollo/server';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 // import { WebSocketServer } from 'ws';
-import { useServer } from 'graphql-ws/lib/use/ws';
+import { Extra, useServer } from 'graphql-ws/lib/use/ws';
 import bodyParser from 'body-parser';
+import { Context, SubscribeMessage } from 'graphql-ws';
 import * as dotenv from 'dotenv';
-// import resolvers from './schema/resolvers';
+import { ExecutionArgs } from 'graphql';
 import { WebSocketServer } from 'ws';
 // import { ApolloServerPluginLandingPageGraphQLPlayground } from '@apollo/server-plugin-landing-page-graphql-playground';
-import { startStandaloneServer } from '@apollo/server/standalone';
 import jwt, { JwtPayload } from 'jsonwebtoken';
-// import typeDefs from './schema/types';
+import { expressMiddleware } from '@apollo/server/express4';
+import resolvers from './schema/resolvers';
+import typeDefs from './schema/types';
 import { syncDatabase } from './db_loaders/mysql';
 import { app } from './config/appConfig';
 import { USER_JWT } from './lib/ultis/jwt';
@@ -41,18 +43,6 @@ interface ContextFunctionProps {
     req: express.Request;
     res: express.Response;
 }
-
-const typeDefs = `#graphql
-type Query {
-    hello: String
-}
-`;
-
-// A map of functions which return data for the schema.
-const resolvers = {
-    Query: {},
-};
-
 const authentication = async (
     authorization: string,
     req: express.Request,
@@ -94,22 +84,22 @@ const context = async ({
         // ...appContext,
     };
 };
-// const getDynamicContext = async (
-//     ctx: Context<
-//         Record<string, unknown> | undefined,
-//         Extra & Partial<Record<PropertyKey, never>>
-//     >,
-//     msg: SubscribeMessage,
-//     args: ExecutionArgs
-// ) => {
-//     if (ctx.connectionParams?.authentication) {
-//         // TODO
-//         console.log('msg: ', msg);
-//         console.log('args: ', args);
-//         return { currentUser: { id: 1 } };
-//     }
-//     return { currentUser: null };
-// };
+const getDynamicContext = async (
+    ctx: Context<
+        Record<string, unknown> | undefined,
+        Extra & Partial<Record<PropertyKey, never>>
+    >,
+    msg: SubscribeMessage,
+    args: ExecutionArgs
+) => {
+    if (ctx.connectionParams?.authentication) {
+        // TODO
+        console.log('msg: ', msg);
+        console.log('args: ', args);
+        return { currentUser: { id: 1 } };
+    }
+    return { currentUser: null };
+};
 
 async function startServer() {
     await Promise.all([syncDatabase()]);
@@ -126,10 +116,10 @@ async function startServer() {
     const serverCleanup = useServer(
         {
             schema,
-            // context: async (ctx, msg, args) => {
-            //     console.log('msg: ');
-            //     return getDynamicContext(ctx, msg, args);
-            // },
+            context: async (ctx, msg, args) => {
+                console.log('msg: ');
+                return getDynamicContext(ctx, msg, args);
+            },
             onConnect: async () => {
                 console.log('A client connected!');
             },
@@ -140,7 +130,7 @@ async function startServer() {
         wsServer
     );
 
-    const server = new ApolloServer({
+    const server = new ApolloServer<ChatContext>({
         typeDefs,
         resolvers,
         csrfPrevention: true,
@@ -158,23 +148,21 @@ async function startServer() {
         ],
     });
 
-    const { url } = await startStandaloneServer(server, {
-        listen: { port: 4003 },
-        // context: async ({ req }) => ({ token: req.headers.token }),
-    });
-    // await server.start();
+    await server.start();
     // This middleware should be added before calling `applyMiddleware`.
     appSrv.use(graphqlUploadExpress());
     appSrv.use(
         '/graphql',
-        bodyParser.json()
-        // expressMiddleware(server, {
-        //     context,
-        // })
+        bodyParser.json(),
+        expressMiddleware(server, {
+            context,
+        })
     );
-    await new Promise<void>(() => {
-        // httpServer.listen({ port: app.port, hostname: app.host }, resolve);
-        console.log(`🚀 Server ready at ${url}graphql`);
+    await new Promise<void>((resolve) => {
+        httpServer.listen({ port: app.port, hostname: app.host }, resolve);
+        console.log(
+            `🚀 Server ready at http://${app.host}:${app.port}/graphql`
+        );
         console.log(
             `🚀 Subscription endpoint ready at ws://${app.host}:${app.port}/subscriptions`
         );

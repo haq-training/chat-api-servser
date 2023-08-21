@@ -3,6 +3,12 @@ import { Options } from 'sequelize';
 
 dotenv.config();
 
+export const app = {
+    host: process.env.SERVER_HOST,
+    port: process.env.SERVER_PORT,
+    secretSign: process.env.SECRET || 'secret',
+};
+
 const mysql_option: Options = {
     host: process.env.MYSQL_HOST || 'localhost',
     port: parseInt(process.env.MYSQL_PORT || '3306', 10),

@@ -28,7 +28,7 @@ export const syncDatabase = async () => {
             })
             .then(async () => {
                 if (isForceSync) {
-                    await models.user.bulkCreate(user);
+                    await models.user.bulkCreate(user as any);
                 }
             })
             .catch((err) => {

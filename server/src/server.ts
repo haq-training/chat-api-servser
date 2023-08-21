@@ -21,11 +21,13 @@ import { WebSocketServer } from 'ws';
 // import { ApolloServerPluginLandingPageGraphQLPlayground } from '@apollo/server-plugin-landing-page-graphql-playground';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { expressMiddleware } from '@apollo/server/express4';
+import { ApolloServerPluginLandingPageGraphQLPlayground } from '@apollo/server-plugin-landing-page-graphql-playground';
 import resolvers from './schema/resolvers';
 import typeDefs from './schema/types';
 import { syncDatabase } from './db_loaders/mysql';
 import { app } from './config/appConfig';
 import { USER_JWT } from './lib/ultis/jwt';
+import { queryExample } from './playground';
 
 dotenv.config();
 
@@ -147,6 +149,28 @@ async function startServer() {
             },
         ],
     });
+    if (process.env.NODE_ENV === 'development') {
+        server.addPlugin(
+            ApolloServerPluginLandingPageGraphQLPlayground({
+                title: 'Chat-API in development',
+                settings: {
+                    'general.betaUpdates': false,
+                    'editor.theme': 'dark',
+                    'editor.cursorShape': 'line',
+                    'editor.reuseHeaders': true,
+                    'tracing.hideTracingResponse': true,
+                    'queryPlan.hideQueryPlanResponse': true,
+                    'editor.fontSize': 14,
+                    'editor.fontFamily':
+                        '"Source Code Pro", "Consolas", "Inconsolata", "Droid Sans Mono", "Monaco", monospace',
+                    'request.credentials': 'omit',
+                    'schema.polling.enable': false,
+                },
+                tabs: await queryExample(),
+                subscriptionEndpoint: `ws://${app.host}:${app.port}/subscriptions`,
+            })
+        );
+    }
 
     await server.start();
     // This middleware should be added before calling `applyMiddleware`.

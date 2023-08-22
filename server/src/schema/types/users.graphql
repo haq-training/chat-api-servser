@@ -1,11 +1,11 @@
 extend type Query {
-    me: User!
-
+    User(id :ID!) : User!
+    Users : [User]
     login(input: UserLoginInput!): UserLoginResponse!
 }
 
 extend type Mutation {
-    createUser(input: CreateUserInput!): User!
+    register(input: CreateUserInput!): User!
 }
 
 type User {

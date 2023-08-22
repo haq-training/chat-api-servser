@@ -44,11 +44,10 @@ export type Scalars = {
 };
 
 export type ICreateUserInput = {
-    avatar_url?: InputMaybe<Scalars['Upload']['input']>;
+    avatarUrl?: InputMaybe<Scalars['Upload']['input']>;
     email: Scalars['String']['input'];
-    file?: InputMaybe<Scalars['Upload']['input']>;
-    first_name: Scalars['String']['input'];
-    last_name: Scalars['String']['input'];
+    firstName: Scalars['String']['input'];
+    lastName: Scalars['String']['input'];
     location?: InputMaybe<Scalars['String']['input']>;
     password: Scalars['String']['input'];
     role: Scalars['Int']['input'];
@@ -65,6 +64,19 @@ export type IMutationCreateUserArgs = {
     input: ICreateUserInput;
 };
 
+export type IPageInfo = {
+    __typename?: 'PageInfo';
+    endCursor?: Maybe<Scalars['Cursor']['output']>;
+    hasNextPage: Scalars['Boolean']['output'];
+};
+
+export type IPaginationInput = {
+    after?: InputMaybe<Scalars['Cursor']['input']>;
+    before?: InputMaybe<Scalars['Cursor']['input']>;
+    first?: InputMaybe<Scalars['Int']['input']>;
+    last?: InputMaybe<Scalars['Int']['input']>;
+};
+
 export type IQuery = {
     __typename?: 'Query';
     login: IUserLoginResponse;
@@ -75,25 +87,18 @@ export type IQueryLoginArgs = {
     input: IUserLoginInput;
 };
 
-export enum IServiceCode {
-    /** This is the message automatically send by system. */
-    NewTaskCreated = 'newTaskCreated',
-    TaskUpdated = 'taskUpdated',
-}
-
 export enum ISuccessResponse {
     Success = 'success',
 }
 
 export type IUser = {
     __typename?: 'User';
-    avatar_url?: Maybe<Scalars['String']['output']>;
+    avatarUrl?: Maybe<Scalars['String']['output']>;
     createdAt?: Maybe<Scalars['Date']['output']>;
     email: Scalars['String']['output'];
-    file?: Maybe<Scalars['String']['output']>;
-    first_name: Scalars['String']['output'];
+    firstName: Scalars['String']['output'];
     id: Scalars['Int']['output'];
-    last_name: Scalars['String']['output'];
+    lastName: Scalars['String']['output'];
     location?: Maybe<Scalars['String']['output']>;
     role: Scalars['Int']['output'];
     status: Scalars['Int']['output'];
@@ -226,8 +231,9 @@ export type IResolversTypes = {
     Int: ResolverTypeWrapper<Scalars['Int']['output']>;
     JSON: ResolverTypeWrapper<Scalars['JSON']['output']>;
     Mutation: ResolverTypeWrapper<{}>;
+    PageInfo: ResolverTypeWrapper<IPageInfo>;
+    PaginationInput: IPaginationInput;
     Query: ResolverTypeWrapper<{}>;
-    ServiceCode: IServiceCode;
     String: ResolverTypeWrapper<Scalars['String']['output']>;
     SuccessResponse: ISuccessResponse;
     Upload: ResolverTypeWrapper<Scalars['Upload']['output']>;
@@ -247,6 +253,8 @@ export type IResolversParentTypes = {
     Int: Scalars['Int']['output'];
     JSON: Scalars['JSON']['output'];
     Mutation: {};
+    PageInfo: IPageInfo;
+    PaginationInput: IPaginationInput;
     Query: {};
     String: Scalars['String']['output'];
     Upload: Scalars['Upload']['output'];
@@ -284,6 +292,19 @@ export type IMutationResolvers<
     >;
 };
 
+export type IPageInfoResolvers<
+    ContextType = any,
+    ParentType extends IResolversParentTypes['PageInfo'] = IResolversParentTypes['PageInfo']
+> = {
+    endCursor?: Resolver<
+        Maybe<IResolversTypes['Cursor']>,
+        ParentType,
+        ContextType
+    >;
+    hasNextPage?: Resolver<IResolversTypes['Boolean'], ParentType, ContextType>;
+    __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type IQueryResolvers<
     ContextType = any,
     ParentType extends IResolversParentTypes['Query'] = IResolversParentTypes['Query']
@@ -306,7 +327,7 @@ export type IUserResolvers<
     ContextType = any,
     ParentType extends IResolversParentTypes['User'] = IResolversParentTypes['User']
 > = {
-    avatar_url?: Resolver<
+    avatarUrl?: Resolver<
         Maybe<IResolversTypes['String']>,
         ParentType,
         ContextType
@@ -317,10 +338,9 @@ export type IUserResolvers<
         ContextType
     >;
     email?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
-    file?: Resolver<Maybe<IResolversTypes['String']>, ParentType, ContextType>;
-    first_name?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
+    firstName?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
     id?: Resolver<IResolversTypes['Int'], ParentType, ContextType>;
-    last_name?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
+    lastName?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
     location?: Resolver<
         Maybe<IResolversTypes['String']>,
         ParentType,
@@ -351,6 +371,7 @@ export type IResolvers<ContextType = any> = {
     Date?: GraphQLScalarType;
     JSON?: GraphQLScalarType;
     Mutation?: IMutationResolvers<ContextType>;
+    PageInfo?: IPageInfoResolvers<ContextType>;
     Query?: IQueryResolvers<ContextType>;
     Upload?: GraphQLScalarType;
     User?: IUserResolvers<ContextType>;

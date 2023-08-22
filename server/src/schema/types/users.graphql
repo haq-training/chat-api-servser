@@ -11,13 +11,12 @@ extend type Mutation {
 type User {
     id: Int!
     email: String!
-    first_name: String!
-    last_name: String!
-    avatar_url: String
+    firstName: String!
+    lastName: String!
+    avatarUrl: String
     status: Int!
     location: String
     story: String
-    file: String
     role: Int!
     createdAt: Date
     updatedAt: Date
@@ -26,14 +25,13 @@ type User {
 input CreateUserInput {
     email: String!
     password: String!
-    first_name: String!
-    last_name: String!
+    firstName: String!
+    lastName: String!
     status: Int!
     role: Int!
     location: String
     story: String
-    avatar_url: Upload
-    file: Upload
+    avatarUrl: Upload
 }
 
 input UserLoginInput {

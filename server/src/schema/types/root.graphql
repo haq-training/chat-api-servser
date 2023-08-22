@@ -6,15 +6,18 @@ type Query
 type Mutation
 #type Subscription
 
+type PageInfo {
+    hasNextPage: Boolean!
+    endCursor: Cursor
+}
+
+input PaginationInput {
+    first: Int
+    after: Cursor
+    last: Int
+    before: Cursor
+}
 
 enum SuccessResponse {
     success
-}
-
-enum ServiceCode {
-    """
-    This is the message automatically send by system.
-    """
-    newTaskCreated
-    taskUpdated
 }

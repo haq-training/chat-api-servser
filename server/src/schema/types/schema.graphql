@@ -9,19 +9,23 @@ type Mutation {
     createUser(input: CreateUserInput!): User!
 }
 
+type PageInfo {
+    endCursor: Cursor
+    hasNextPage: Boolean!
+}
+
 type Query {
     login(input: UserLoginInput!): UserLoginResponse!
     me: User!
 }
 
 type User {
-    avatar_url: String
+    avatarUrl: String
     createdAt: Date
     email: String!
-    file: String
-    first_name: String!
+    firstName: String!
     id: Int!
-    last_name: String!
+    lastName: String!
     location: String
     role: Int!
     status: Int!
@@ -32,12 +36,6 @@ type User {
 type UserLoginResponse {
     token: String!
     user: User!
-}
-
-enum ServiceCode {
-    "This is the message automatically send by system."
-    newTaskCreated
-    taskUpdated
 }
 
 enum SuccessResponse {
@@ -53,16 +51,22 @@ scalar JSON
 scalar Upload
 
 input CreateUserInput {
-    avatar_url: Upload
+    avatarUrl: Upload
     email: String!
-    file: Upload
-    first_name: String!
-    last_name: String!
+    firstName: String!
+    lastName: String!
     location: String
     password: String!
     role: Int!
     status: Int!
     story: String
+}
+
+input PaginationInput {
+    after: Cursor
+    before: Cursor
+    first: Int
+    last: Int
 }
 
 input UserLoginInput {

@@ -19,10 +19,10 @@ services:
         env_file:
             - .env
         environment:
-            - MYSQL_ROOT_PASSWORD=training2023PDC
-            - MYSQL_DATABASE=chat-mysql
-            - MYSQL_USER=admin
-            - MYSQL_PASSWORD=training2023PDC
+            - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+            - MYSQL_DATABASE=${MYSQL_NAME}
+            - MYSQL_USER=${MYSQL_USER}
+            - MYSQL_PASSWORD=${MYSQL_PASSWORD}
         command:
             - --character-set-server=utf8mb4
         volumes:

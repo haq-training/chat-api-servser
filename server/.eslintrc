@@ -34,7 +34,7 @@
                 }
             }
         ],
-        "linebreak-style": [2, "unix"],
+        "linebreak-style": "off",
         "quotes": ["error", "single"],
         "semi": ["error", "always"],
         "array-bracket-newline": "warn",
@@ -67,9 +67,9 @@
             }
         ],
         "max-len": [
-            "off",
+            "error",
             {
-                "code": 200,
+                "code": 150,
                 "tabWidth": 4
             }
         ],
@@ -86,7 +86,19 @@
         ],
         "import/prefer-default-export": "off",
         "@typescript-eslint/no-explicit-any": "off",
-        "max-classes-per-file": ["error", 100]
+        "max-classes-per-file": ["error", 100],
+        "prettier/prettier": [
+            "off",
+            {
+                "printWidth": 150,
+                "trailingComma": "es5",
+                "tabWidth": 4,
+                "semi": true,
+                "singleQuote": true,
+                "bracketSpacing": true,
+                "endOfLine": "auto"
+            }
+        ]
     },
     "globals": {
         "arguments": true

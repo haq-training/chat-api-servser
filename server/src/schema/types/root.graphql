@@ -1,0 +1,20 @@
+scalar Date
+scalar JSON
+scalar Cursor
+scalar Upload
+type Query
+type Mutation
+#type Subscription
+
+
+enum SuccessResponse {
+    success
+}
+
+enum ServiceCode {
+    """
+    This is the message automatically send by system.
+    """
+    newTaskCreated
+    taskUpdated
+}

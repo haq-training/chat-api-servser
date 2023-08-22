@@ -4,17 +4,16 @@ import { app } from '../../config/appConfig';
 export interface USER_JWT {
     id: number;
     email: string;
-    password: string;
-    avatar_url?: string;
-    first_name?: string;
-    last_name?: string;
-    status: string;
+    avatarUrl?: string;
+    firstName?: string;
+    lastName?: string;
+    status: number;
     location?: string;
     story?: string;
     file?: string;
     role: string;
-    created_at?: string;
-    updated_at?: string;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 export const generateJWT = (user: USER_JWT) => {

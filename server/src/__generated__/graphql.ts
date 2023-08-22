@@ -5,6 +5,7 @@ import {
 } from 'graphql';
 import { users } from '../db_models/init-models';
 export type Maybe<T> = T | null;
+export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = {
     [K in keyof T]: T[K];
 };
@@ -14,34 +15,45 @@ export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
     [SubKey in K]: Maybe<T[SubKey]>;
 };
+export type MakeEmpty<
+    T extends { [key: string]: unknown },
+    K extends keyof T
+> = { [_ in K]?: never };
+export type Incremental<T> =
+    | T
+    | {
+          [P in keyof T]?: P extends ' $fragmentName' | '__typename'
+              ? T[P]
+              : never;
+      };
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
-export type RequireFields<T, K extends keyof T> = {
-    [X in Exclude<keyof T, K>]?: T[X];
-} & { [P in K]-?: NonNullable<T[P]> };
+export type RequireFields<T, K extends keyof T> = Omit<T, K> & {
+    [P in K]-?: NonNullable<T[P]>;
+};
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-    ID: string;
-    String: string;
-    Boolean: boolean;
-    Int: number;
-    Float: number;
-    Cursor: any;
-    Date: any;
-    JSON: any;
-    Upload: any;
+    ID: { input: string; output: string };
+    String: { input: string; output: string };
+    Boolean: { input: boolean; output: boolean };
+    Int: { input: number; output: number };
+    Float: { input: number; output: number };
+    Cursor: { input: any; output: any };
+    Date: { input: any; output: any };
+    JSON: { input: any; output: any };
+    Upload: { input: any; output: any };
 };
 
 export type ICreateUserInput = {
-    email: Scalars['String'];
-    password: Scalars['String'];
-    first_name: Scalars['String'];
-    last_name: Scalars['String'];
-    status: Scalars['Int'];
-    role: Scalars['Int'];
-    location?: Maybe<Scalars['String']>;
-    story?: Maybe<Scalars['String']>;
-    avatar_url?: Maybe<Scalars['Upload']>;
-    file?: Maybe<Scalars['Upload']>;
+    avatar_url?: InputMaybe<Scalars['Upload']['input']>;
+    email: Scalars['String']['input'];
+    file?: InputMaybe<Scalars['Upload']['input']>;
+    first_name: Scalars['String']['input'];
+    last_name: Scalars['String']['input'];
+    location?: InputMaybe<Scalars['String']['input']>;
+    password: Scalars['String']['input'];
+    role: Scalars['Int']['input'];
+    status: Scalars['Int']['input'];
+    story?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type IMutation = {
@@ -55,8 +67,8 @@ export type IMutationCreateUserArgs = {
 
 export type IQuery = {
     __typename?: 'Query';
-    me: IUser;
     login: IUserLoginResponse;
+    me: IUser;
 };
 
 export type IQueryLoginArgs = {
@@ -75,48 +87,39 @@ export enum ISuccessResponse {
 
 export type IUser = {
     __typename?: 'User';
-    id: Scalars['Int'];
-    email: Scalars['String'];
-    first_name: Scalars['String'];
-    last_name: Scalars['String'];
-    avatar_url?: Maybe<Scalars['String']>;
-    status: Scalars['Int'];
-    location?: Maybe<Scalars['String']>;
-    story?: Maybe<Scalars['String']>;
-    file?: Maybe<Scalars['String']>;
-    role: Scalars['Int'];
-    createdAt?: Maybe<Scalars['Date']>;
-    updatedAt?: Maybe<Scalars['Date']>;
+    avatar_url?: Maybe<Scalars['String']['output']>;
+    createdAt?: Maybe<Scalars['Date']['output']>;
+    email: Scalars['String']['output'];
+    file?: Maybe<Scalars['String']['output']>;
+    first_name: Scalars['String']['output'];
+    id: Scalars['Int']['output'];
+    last_name: Scalars['String']['output'];
+    location?: Maybe<Scalars['String']['output']>;
+    role: Scalars['Int']['output'];
+    status: Scalars['Int']['output'];
+    story?: Maybe<Scalars['String']['output']>;
+    updatedAt?: Maybe<Scalars['Date']['output']>;
 };
 
 export type IUserLoginInput = {
-    account: Scalars['String'];
-    password: Scalars['String'];
+    account: Scalars['String']['input'];
+    password: Scalars['String']['input'];
 };
 
 export type IUserLoginResponse = {
     __typename?: 'UserLoginResponse';
-    token: Scalars['String'];
+    token: Scalars['String']['output'];
     user: IUser;
 };
 
 export type ResolverTypeWrapper<T> = Promise<T> | T;
 
-export type LegacyStitchingResolver<TResult, TParent, TContext, TArgs> = {
-    fragment: string;
+export type ResolverWithResolve<TResult, TParent, TContext, TArgs> = {
     resolve: ResolverFn<TResult, TParent, TContext, TArgs>;
 };
-
-export type NewStitchingResolver<TResult, TParent, TContext, TArgs> = {
-    selectionSet: string;
-    resolve: ResolverFn<TResult, TParent, TContext, TArgs>;
-};
-export type StitchingResolver<TResult, TParent, TContext, TArgs> =
-    | LegacyStitchingResolver<TResult, TParent, TContext, TArgs>
-    | NewStitchingResolver<TResult, TParent, TContext, TArgs>;
 export type Resolver<TResult, TParent = {}, TContext = {}, TArgs = {}> =
     | ResolverFn<TResult, TParent, TContext, TArgs>
-    | StitchingResolver<TResult, TParent, TContext, TArgs>;
+    | ResolverWithResolve<TResult, TParent, TContext, TArgs>;
 
 export type ResolverFn<TResult, TParent, TContext, TArgs> = (
     parent: TParent,
@@ -130,7 +133,7 @@ export type SubscriptionSubscribeFn<TResult, TParent, TContext, TArgs> = (
     args: TArgs,
     context: TContext,
     info: GraphQLResolveInfo
-) => AsyncIterator<TResult> | Promise<AsyncIterator<TResult>>;
+) => AsyncIterable<TResult> | Promise<AsyncIterable<TResult>>;
 
 export type SubscriptionResolveFn<TResult, TParent, TContext, TArgs> = (
     parent: TParent,
@@ -216,42 +219,42 @@ export type DirectiveResolverFn<
 
 /** Mapping between all available schema types and the resolvers types */
 export type IResolversTypes = {
+    Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
     CreateUserInput: ICreateUserInput;
-    String: ResolverTypeWrapper<Scalars['String']>;
-    Int: ResolverTypeWrapper<Scalars['Int']>;
-    Cursor: ResolverTypeWrapper<Scalars['Cursor']>;
-    Date: ResolverTypeWrapper<Scalars['Date']>;
-    JSON: ResolverTypeWrapper<Scalars['JSON']>;
+    Cursor: ResolverTypeWrapper<Scalars['Cursor']['output']>;
+    Date: ResolverTypeWrapper<Scalars['Date']['output']>;
+    Int: ResolverTypeWrapper<Scalars['Int']['output']>;
+    JSON: ResolverTypeWrapper<Scalars['JSON']['output']>;
     Mutation: ResolverTypeWrapper<{}>;
     Query: ResolverTypeWrapper<{}>;
     ServiceCode: IServiceCode;
+    String: ResolverTypeWrapper<Scalars['String']['output']>;
     SuccessResponse: ISuccessResponse;
-    Upload: ResolverTypeWrapper<Scalars['Upload']>;
+    Upload: ResolverTypeWrapper<Scalars['Upload']['output']>;
     User: ResolverTypeWrapper<users>;
     UserLoginInput: IUserLoginInput;
     UserLoginResponse: ResolverTypeWrapper<
         Omit<IUserLoginResponse, 'user'> & { user: IResolversTypes['User'] }
     >;
-    Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
 export type IResolversParentTypes = {
+    Boolean: Scalars['Boolean']['output'];
     CreateUserInput: ICreateUserInput;
-    String: Scalars['String'];
-    Int: Scalars['Int'];
-    Cursor: Scalars['Cursor'];
-    Date: Scalars['Date'];
-    JSON: Scalars['JSON'];
+    Cursor: Scalars['Cursor']['output'];
+    Date: Scalars['Date']['output'];
+    Int: Scalars['Int']['output'];
+    JSON: Scalars['JSON']['output'];
     Mutation: {};
     Query: {};
-    Upload: Scalars['Upload'];
+    String: Scalars['String']['output'];
+    Upload: Scalars['Upload']['output'];
     User: users;
     UserLoginInput: IUserLoginInput;
     UserLoginResponse: Omit<IUserLoginResponse, 'user'> & {
         user: IResolversParentTypes['User'];
     };
-    Boolean: Scalars['Boolean'];
 };
 
 export interface ICursorScalarConfig
@@ -285,13 +288,13 @@ export type IQueryResolvers<
     ContextType = any,
     ParentType extends IResolversParentTypes['Query'] = IResolversParentTypes['Query']
 > = {
-    me?: Resolver<IResolversTypes['User'], ParentType, ContextType>;
     login?: Resolver<
         IResolversTypes['UserLoginResponse'],
         ParentType,
         ContextType,
         RequireFields<IQueryLoginArgs, 'input'>
     >;
+    me?: Resolver<IResolversTypes['User'], ParentType, ContextType>;
 };
 
 export interface IUploadScalarConfig
@@ -303,29 +306,29 @@ export type IUserResolvers<
     ContextType = any,
     ParentType extends IResolversParentTypes['User'] = IResolversParentTypes['User']
 > = {
-    id?: Resolver<IResolversTypes['Int'], ParentType, ContextType>;
-    email?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
-    first_name?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
-    last_name?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
     avatar_url?: Resolver<
         Maybe<IResolversTypes['String']>,
         ParentType,
         ContextType
     >;
-    status?: Resolver<IResolversTypes['Int'], ParentType, ContextType>;
-    location?: Resolver<
-        Maybe<IResolversTypes['String']>,
-        ParentType,
-        ContextType
-    >;
-    story?: Resolver<Maybe<IResolversTypes['String']>, ParentType, ContextType>;
-    file?: Resolver<Maybe<IResolversTypes['String']>, ParentType, ContextType>;
-    role?: Resolver<IResolversTypes['Int'], ParentType, ContextType>;
     createdAt?: Resolver<
         Maybe<IResolversTypes['Date']>,
         ParentType,
         ContextType
     >;
+    email?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
+    file?: Resolver<Maybe<IResolversTypes['String']>, ParentType, ContextType>;
+    first_name?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
+    id?: Resolver<IResolversTypes['Int'], ParentType, ContextType>;
+    last_name?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
+    location?: Resolver<
+        Maybe<IResolversTypes['String']>,
+        ParentType,
+        ContextType
+    >;
+    role?: Resolver<IResolversTypes['Int'], ParentType, ContextType>;
+    status?: Resolver<IResolversTypes['Int'], ParentType, ContextType>;
+    story?: Resolver<Maybe<IResolversTypes['String']>, ParentType, ContextType>;
     updatedAt?: Resolver<
         Maybe<IResolversTypes['Date']>,
         ParentType,

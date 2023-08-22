@@ -9,7 +9,7 @@ dotenv.config();
 export const app = {
     host: process.env.SERVER_HOST,
     port: process.env.SERVER_PORT,
-    secretSign: process.env.SECRET || 'secret',
+    secretSign: process.env.SECRET || 'super-secret-training2023',
 };
 
 const mysql_option: Options = {

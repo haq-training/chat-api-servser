@@ -27,14 +27,12 @@ const userResolver: IResolvers = {
             const userInfo: USER_JWT = {
                 id: user.id,
                 email: user.email,
-                password: user.password,
-                avatar_url: user.avatar_url,
-                first_name: user.first_name,
-                last_name: user.last_name,
+                avatarUrl: user.avatarUrl,
+                firstName: user.firstName,
+                lastName: user.lastName,
                 status: user.status,
                 location: user.location,
                 story: user.story,
-                file: user.file,
                 role: user.role,
             };
 

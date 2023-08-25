@@ -5,7 +5,7 @@ extend type Query {
 }
 
 extend type Mutation {
-    createUser(input: CreateUserInput!): User!
+    register(input: CreateUserInput!): User!
 }
 
 type User {
@@ -14,7 +14,7 @@ type User {
     firstName: String!
     lastName: String!
     avatarUrl: String
-    status: Int!
+    status: Boolean
     location: String
     story: String
     role: Int!
@@ -27,7 +27,6 @@ input CreateUserInput {
     password: String!
     firstName: String!
     lastName: String!
-    status: Int!
     role: Int!
     location: String
     story: String

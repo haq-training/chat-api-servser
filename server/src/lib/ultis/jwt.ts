@@ -7,11 +7,11 @@ export interface USER_JWT {
     avatarUrl?: string;
     firstName?: string;
     lastName?: string;
-    status: number;
+    status?: boolean;
     location?: string;
     story?: string;
     file?: string;
-    role: string;
+    role: number;
     createdAt?: string;
     updatedAt?: string;
 }

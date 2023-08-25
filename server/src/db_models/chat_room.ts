@@ -6,14 +6,18 @@ export interface chat_roomAttributes {
     id: number;
     type: number;
     roomName?: string;
-    createAt?: Date;
-    updateAt?: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
     isOpen: number;
 }
 
 export type chat_roomPk = 'id';
 export type chat_roomId = chat_room[chat_roomPk];
-export type chat_roomOptionalAttributes = 'roomName' | 'createAt' | 'updateAt';
+export type chat_roomOptionalAttributes =
+    | 'id'
+    | 'roomName'
+    | 'createdAt'
+    | 'updatedAt';
 export type chat_roomCreationAttributes = Optional<
     chat_roomAttributes,
     chat_roomOptionalAttributes
@@ -29,9 +33,9 @@ export class chat_room
 
     roomName?: string;
 
-    createAt?: Date;
+    createdAt?: Date;
 
-    updateAt?: Date;
+    updatedAt?: Date;
 
     isOpen!: number;
 
@@ -86,6 +90,7 @@ export class chat_room
                     type: DataTypes.INTEGER,
                     allowNull: false,
                     primaryKey: true,
+                    autoIncrement: true,
                 },
                 type: {
                     type: DataTypes.INTEGER,
@@ -95,11 +100,11 @@ export class chat_room
                     type: DataTypes.STRING(45),
                     allowNull: true,
                 },
-                createAt: {
+                createdAt: {
                     type: DataTypes.DATE,
                     allowNull: true,
                 },
-                updateAt: {
+                updatedAt: {
                     type: DataTypes.DATE,
                     allowNull: true,
                 },

@@ -51,16 +51,15 @@ export type ICreateUserInput = {
     location?: InputMaybe<Scalars['String']['input']>;
     password: Scalars['String']['input'];
     role: Scalars['Int']['input'];
-    status: Scalars['Int']['input'];
     story?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type IMutation = {
     __typename?: 'Mutation';
-    createUser: IUser;
+    register: IUser;
 };
 
-export type IMutationCreateUserArgs = {
+export type IMutationRegisterArgs = {
     input: ICreateUserInput;
 };
 
@@ -101,7 +100,7 @@ export type IUser = {
     lastName: Scalars['String']['output'];
     location?: Maybe<Scalars['String']['output']>;
     role: Scalars['Int']['output'];
-    status: Scalars['Int']['output'];
+    status?: Maybe<Scalars['Boolean']['output']>;
     story?: Maybe<Scalars['String']['output']>;
     updatedAt?: Maybe<Scalars['Date']['output']>;
 };
@@ -284,11 +283,11 @@ export type IMutationResolvers<
     ContextType = any,
     ParentType extends IResolversParentTypes['Mutation'] = IResolversParentTypes['Mutation']
 > = {
-    createUser?: Resolver<
+    register?: Resolver<
         IResolversTypes['User'],
         ParentType,
         ContextType,
-        RequireFields<IMutationCreateUserArgs, 'input'>
+        RequireFields<IMutationRegisterArgs, 'input'>
     >;
 };
 
@@ -347,7 +346,11 @@ export type IUserResolvers<
         ContextType
     >;
     role?: Resolver<IResolversTypes['Int'], ParentType, ContextType>;
-    status?: Resolver<IResolversTypes['Int'], ParentType, ContextType>;
+    status?: Resolver<
+        Maybe<IResolversTypes['Boolean']>,
+        ParentType,
+        ContextType
+    >;
     story?: Resolver<Maybe<IResolversTypes['String']>, ParentType, ContextType>;
     updatedAt?: Resolver<
         Maybe<IResolversTypes['Date']>,

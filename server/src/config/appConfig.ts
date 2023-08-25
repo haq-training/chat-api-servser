@@ -40,3 +40,15 @@ export const database = {
         uri: `mongodb://${process.env.MONGODB_HOST}:27017/${process.env.MONGODB_NAME}`,
     },
 };
+
+export const storageConfig = {
+    minIO: {
+        domain: process.env.MINIO_DOMAIN || 'http://116.103.228.13:9001/',
+        devApp: process.env.MINIO_BUCKET || 'dev-app',
+        endPoint: process.env.MINIO_ENDPOINT || '116.103.228.13',
+        port: parseInt(process.env.MINIO_PORT || '9000', 10),
+        useSSL: process.env.MINIO_SSL === 'true',
+        accessKey: process.env.MINIO_ACCESS || '',
+        secretKey: process.env.MINIO_SECRET || '',
+    },
+};

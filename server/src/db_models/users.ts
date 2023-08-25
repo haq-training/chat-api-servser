@@ -11,10 +11,10 @@ export interface usersAttributes {
     avatarUrl?: string;
     firstName?: string;
     lastName?: string;
-    status: number;
+    status?: boolean;
     location?: string;
     story?: string;
-    role: string;
+    role: number;
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -22,6 +22,7 @@ export interface usersAttributes {
 export type usersPk = 'id';
 export type usersId = users[usersPk];
 export type usersOptionalAttributes =
+    | 'id'
     | 'avatarUrl'
     | 'firstName'
     | 'lastName'
@@ -50,13 +51,13 @@ export class users
 
     lastName?: string;
 
-    status!: number;
+    status?: boolean;
 
     location?: string;
 
     story?: string;
 
-    role!: string;
+    role!: number;
 
     createdAt?: Date;
 
@@ -209,6 +210,7 @@ export class users
                     type: DataTypes.INTEGER,
                     allowNull: false,
                     primaryKey: true,
+                    autoIncrement: true,
                 },
                 email: {
                     type: DataTypes.STRING(45),
@@ -216,11 +218,11 @@ export class users
                     unique: 'email_UNIQUE',
                 },
                 password: {
-                    type: DataTypes.STRING(45),
+                    type: DataTypes.STRING(200),
                     allowNull: false,
                 },
                 avatarUrl: {
-                    type: DataTypes.STRING(45),
+                    type: DataTypes.STRING(200),
                     allowNull: true,
                 },
                 firstName: {
@@ -233,7 +235,7 @@ export class users
                 },
                 status: {
                     type: DataTypes.BOOLEAN,
-                    allowNull: false,
+                    allowNull: true,
                 },
                 location: {
                     type: DataTypes.STRING(45),
@@ -244,8 +246,16 @@ export class users
                     allowNull: true,
                 },
                 role: {
-                    type: DataTypes.STRING(45),
+                    type: DataTypes.BOOLEAN,
                     allowNull: false,
+                },
+                createdAt: {
+                    type: DataTypes.DATE,
+                    allowNull: true,
+                },
+                updatedAt: {
+                    type: DataTypes.DATE,
+                    allowNull: true,
                 },
             },
             {

@@ -5,6 +5,7 @@ export enum Chat_ERROR_CODE {
     Unauthenticated = 'Unauthenticated',
     UserNotFound = 'UserNotFound',
     UserAlreadyExist = 'UserAlreadyExist',
+    InValidRole = 'InValidRole',
     MySQL = 'MySQL',
 }
 
@@ -38,6 +39,16 @@ export class UserAlreadyExistError extends GraphQLError {
                 },
             }
         );
+    }
+}
+
+export class InValidRoleError extends GraphQLError {
+    constructor(message: string | null = null) {
+        super(message || 'Không xác định được quyền truy cập của người dùng', {
+            extensions: {
+                code: Chat_ERROR_CODE.InValidRole,
+            },
+        });
     }
 }
 

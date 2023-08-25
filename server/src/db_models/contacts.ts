@@ -7,16 +7,17 @@ export interface contactsAttributes {
     userId: number;
     friendId: number;
     typeRelationship?: string;
-    createAt?: string;
-    updateAt?: string;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 export type contactsPk = 'id';
 export type contactsId = contacts[contactsPk];
 export type contactsOptionalAttributes =
+    | 'id'
     | 'typeRelationship'
-    | 'createAt'
-    | 'updateAt';
+    | 'createdAt'
+    | 'updatedAt';
 export type contactsCreationAttributes = Optional<
     contactsAttributes,
     contactsOptionalAttributes
@@ -34,9 +35,9 @@ export class contacts
 
     typeRelationship?: string;
 
-    createAt?: string;
+    createdAt?: string;
 
-    updateAt?: string;
+    updatedAt?: string;
 
     // contacts belongsTo users via userId
     user!: users;
@@ -63,6 +64,7 @@ export class contacts
                     type: DataTypes.INTEGER,
                     allowNull: false,
                     primaryKey: true,
+                    autoIncrement: true,
                 },
                 userId: {
                     type: DataTypes.INTEGER,
@@ -84,11 +86,11 @@ export class contacts
                     type: DataTypes.STRING(45),
                     allowNull: true,
                 },
-                createAt: {
+                createdAt: {
                     type: DataTypes.STRING(45),
                     allowNull: true,
                 },
-                updateAt: {
+                updatedAt: {
                     type: DataTypes.STRING(45),
                     allowNull: true,
                 },

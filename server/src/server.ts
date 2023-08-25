@@ -11,14 +11,12 @@ import express from 'express';
 import { ApolloServer } from '@apollo/server';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
 import { makeExecutableSchema } from '@graphql-tools/schema';
-// import { WebSocketServer } from 'ws';
 import { Extra, useServer } from 'graphql-ws/lib/use/ws';
 import bodyParser from 'body-parser';
 import { Context, SubscribeMessage } from 'graphql-ws';
 import * as dotenv from 'dotenv';
 import { ExecutionArgs } from 'graphql';
 import { WebSocketServer } from 'ws';
-// import { ApolloServerPluginLandingPageGraphQLPlayground } from '@apollo/server-plugin-landing-page-graphql-playground';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { expressMiddleware } from '@apollo/server/express4';
 import { ApolloServerPluginLandingPageGraphQLPlayground } from '@apollo/server-plugin-landing-page-graphql-playground';
@@ -28,6 +26,7 @@ import { syncDatabase } from './db_loaders/mysql';
 import { app } from './config/appConfig';
 import { USER_JWT } from './lib/ultis/jwt';
 import { queryExample } from './playground';
+import MinIOServices from './lib/classes/MinIOServices';
 
 dotenv.config();
 
@@ -37,7 +36,7 @@ export interface ChatContext {
     error: any;
     req: express.Request;
     res: express.Response;
-    // awsS3StorageService: AwsS3StorageService;
+    minIOServices: MinIOServices;
     // pubsub: PubSubService;
 }
 

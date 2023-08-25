@@ -9,16 +9,17 @@ export interface chat_membersAttributes {
     userId: number;
     isAdmin: number;
     status: number;
-    createAt?: Date;
-    updateAt?: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
     lastViewMsg?: Date;
 }
 
 export type chat_membersPk = 'id';
 export type chat_membersId = chat_members[chat_membersPk];
 export type chat_membersOptionalAttributes =
-    | 'createAt'
-    | 'updateAt'
+    | 'id'
+    | 'createdAt'
+    | 'updatedAt'
     | 'lastViewMsg';
 export type chat_membersCreationAttributes = Optional<
     chat_membersAttributes,
@@ -39,9 +40,9 @@ export class chat_members
 
     status!: number;
 
-    createAt?: Date;
+    createdAt?: Date;
 
-    updateAt?: Date;
+    updatedAt?: Date;
 
     lastViewMsg?: Date;
 
@@ -73,6 +74,7 @@ export class chat_members
                     type: DataTypes.INTEGER,
                     allowNull: false,
                     primaryKey: true,
+                    autoIncrement: true,
                 },
                 chatRoomId: {
                     type: DataTypes.INTEGER,
@@ -98,11 +100,11 @@ export class chat_members
                     type: DataTypes.BOOLEAN,
                     allowNull: false,
                 },
-                createAt: {
+                createdAt: {
                     type: DataTypes.DATE,
                     allowNull: true,
                 },
-                updateAt: {
+                updatedAt: {
                     type: DataTypes.DATE,
                     allowNull: true,
                 },

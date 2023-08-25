@@ -4,16 +4,15 @@ query Query($input: UserLoginInput!) {
         user {
             id
             email
-            first_name
-            last_name
+            firstName
+            lastName
             status
             story
-            file
             createdAt
             updatedAt
             role
             location
-            avatar_url
+            avatarUrl
         }
     }
 }

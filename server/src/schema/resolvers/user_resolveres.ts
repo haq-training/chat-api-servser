@@ -2,10 +2,18 @@
 // @ts-ignore
 // eslint-disable-next-line import/extensions
 import bcrypt from 'bcrypt';
+import { Transaction } from 'sequelize';
 import { IResolvers } from '../../__generated__/graphql';
-import { UserNotFoundError } from '../../lib/classes/graphqlErrors';
+import { MySQLError, UserNotFoundError } from '../../lib/classes/graphqlErrors';
 import { generateJWT, USER_JWT } from '../../lib/ultis/jwt';
-import { db } from '../../db_loaders/mysql';
+import { db, sequelize } from '../../db_loaders/mysql';
+import { storageConfig } from '../../config/appConfig';
+import { minIOServices } from '../../lib/classes';
+import { ChatContext } from '../../server';
+import { usersCreationAttributes } from '../../db_models/users';
+import { DefaultHashValue } from '../../lib/enum';
+import { checkAuthentication } from '../../lib/ultis/permision';
+import { iRoleToNumber } from '../../lib/enum_resolvers';
 
 const userResolver: IResolvers = {
     Query: {
@@ -43,7 +51,72 @@ const userResolver: IResolvers = {
             };
         },
     },
-    Mutation: {},
+    Mutation: {
+        register: async (_parent, { input }, context: ChatContext) => {
+            checkAuthentication(context);
+            const {
+                email,
+                password,
+                firstName,
+                lastName,
+                role,
+                location,
+                story,
+                avatarUrl,
+            } = input;
+
+            const createdUser = await db.users.findOne({
+                where: {
+                    email,
+                },
+                rejectOnEmpty: false,
+            });
+            if (createdUser) {
+                throw new Error();
+            }
+
+            const salt = bcrypt.genSaltSync(DefaultHashValue.saltRounds);
+            const hashedPassword = bcrypt.hashSync(password, salt);
+
+            const userAttribute: usersCreationAttributes = {
+                email,
+                password: hashedPassword,
+                firstName,
+                lastName,
+                role: iRoleToNumber(role),
+                location: location ?? undefined,
+                story: story ?? undefined,
+            };
+
+            return await sequelize.transaction(async (t: Transaction) => {
+                try {
+                    const newUser = await db.users.create(userAttribute, {
+                        transaction: t,
+                    });
+                    if (avatarUrl) {
+                        const { createReadStream, filename, mimetype } =
+                            await avatarUrl.file;
+                        const fileStream = createReadStream();
+                        const filePath = `avatar/users/${newUser.id}/${filename}`;
+                        await minIOServices.upload(
+                            storageConfig.minIO.devApp,
+                            filePath,
+                            fileStream,
+                            mimetype
+                        );
+                        newUser.avatarUrl = filePath;
+                        await newUser.save({ transaction: t });
+                    }
+                    return newUser;
+                } catch (error) {
+                    await t.rollback();
+                    throw new MySQLError(
+                        `Lỗi bất thường khi thao tác trong cơ sở dữ liệu: ${error}`
+                    );
+                }
+            });
+        },
+    },
 };
 
 export default userResolver;

@@ -9,18 +9,19 @@ export interface fileAttributes {
     keyPath: string;
     bucket: string;
     encoding?: string;
-    createAt?: Date;
-    updateAt?: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 export type filePk = 'id';
 export type fileId = file[filePk];
 export type fileOptionalAttributes =
+    | 'id'
     | 'uploadBy'
     | 'mimeType'
     | 'encoding'
-    | 'createAt'
-    | 'updateAt';
+    | 'createdAt'
+    | 'updatedAt';
 export type fileCreationAttributes = Optional<
     fileAttributes,
     fileOptionalAttributes
@@ -62,6 +63,7 @@ export class file
                     type: DataTypes.INTEGER,
                     allowNull: false,
                     primaryKey: true,
+                    autoIncrement: true,
                 },
                 uploadBy: {
                     type: DataTypes.INTEGER,
@@ -87,11 +89,11 @@ export class file
                     type: DataTypes.STRING(45),
                     allowNull: true,
                 },
-                createAt: {
+                createdAt: {
                     type: DataTypes.DATE,
                     allowNull: true,
                 },
-                updateAt: {
+                updatedAt: {
                     type: DataTypes.DATE,
                     allowNull: true,
                 },

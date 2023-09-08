@@ -1,12 +1,8 @@
-// eslint-disable-next-line import/extensions,@typescript-eslint/ban-ts-comment
-// @ts-ignore
-// eslint-disable-next-line import/extensions
-// noinspection HttpUrlsUsage
-import { createServer } from 'http';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 // eslint-disable-next-line import/extensions
 import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.js';
+import { createServer } from 'http';
 import express from 'express';
 import { ApolloServer } from '@apollo/server';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
@@ -27,6 +23,9 @@ import { app } from './config/appConfig';
 import { USER_JWT } from './lib/ultis/jwt';
 import { queryExample } from './playground';
 import MinIOServices from './lib/classes/MinIOServices';
+import { mongoLoader } from './db_loaders/mongodb';
+import PubSubService from './lib/classes/PubSubService';
+import { minIOServices, pubsub_service } from './lib/classes';
 
 dotenv.config();
 
@@ -37,13 +36,21 @@ export interface ChatContext {
     req: express.Request;
     res: express.Response;
     minIOServices: MinIOServices;
-    // pubsub: PubSubService;
+    pubsub: PubSubService;
 }
 
 interface ContextFunctionProps {
     req: express.Request;
     res: express.Response;
 }
+
+const appContext: Omit<
+    ChatContext,
+    'user' | 'isAuth' | 'error' | 'req' | 'res'
+> = {
+    pubsub: pubsub_service,
+    minIOServices,
+};
 const authentication = async (
     authorization: string,
     req: express.Request,
@@ -82,7 +89,7 @@ const context = async ({
     const auth = await authentication(token, req, res);
     return {
         ...auth,
-        // ...appContext,
+        ...appContext,
     };
 };
 const getDynamicContext = async (
@@ -103,7 +110,7 @@ const getDynamicContext = async (
 };
 
 async function startServer() {
-    await Promise.all([syncDatabase()]);
+    await Promise.all([syncDatabase(), mongoLoader()]);
     const appSrv = express();
     const schema = makeExecutableSchema({ typeDefs, resolvers });
     const httpServer = createServer(appSrv);

@@ -28,9 +28,9 @@ services:
         volumes:
             - mysql-volume:/var/lib/mysql
 
-    redis:
+    chat-redis:
         image: redis:6.0.5
-        container_name: redis
+        container_name: chat-redis
         ports:
             - "6378:6379"
         restart: always
@@ -47,7 +47,7 @@ services:
             - "4003:4003"
         restart: always
         depends_on:
-            - redis
+            - chat-redis
             - chat-mongodb
             - chat-mysql-db
         volumes:

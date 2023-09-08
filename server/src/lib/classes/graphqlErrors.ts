@@ -7,6 +7,7 @@ export enum Chat_ERROR_CODE {
     UserAlreadyExist = 'UserAlreadyExist',
     InValidRole = 'InValidRole',
     MySQL = 'MySQL',
+    InvalidPaginationArgument = 'InvalidPaginationArgument',
 }
 
 export class AuthenticationError extends GraphQLError {
@@ -57,6 +58,16 @@ export class MySQLError extends GraphQLError {
         super(message || 'Lỗi bất thường khi thao tác trong cơ sở dữ liệu', {
             extensions: {
                 code: Chat_ERROR_CODE.MySQL,
+            },
+        });
+    }
+}
+
+export class InvalidPaginationArgumentError extends GraphQLError {
+    constructor(message: string) {
+        super(message || 'Lỗi bất thường khi thao tác trong cơ sở dữ liệu', {
+            extensions: {
+                code: Chat_ERROR_CODE.InvalidPaginationArgument,
             },
         });
     }

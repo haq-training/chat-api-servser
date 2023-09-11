@@ -1,11 +1,16 @@
 extend type Query {
-    me: User!
-
+    users: [User]
+    user(id:ID!): User!
     login(input: UserLoginInput!): UserLoginResponse!
 }
 
 extend type Mutation {
     register(input: CreateUserInput!): User!
+    updateUser(input:UpdateUserInput!):SuccessResponse!
+    addFriend(id:ID!):SuccessResponse!
+    unFriend(id:ID!):SuccessResponse!
+    ChangePassword(input : changePasswordInput):SuccessResponse!
+    delete_user(id:ID!):SuccessResponse!
 }
 
 type User {
@@ -21,7 +26,14 @@ type User {
     createdAt: Date
     updatedAt: Date
 }
-
+input UpdateUserInput{
+    id : Int!
+    firstName: String
+    lastName: String
+    avatar: Upload
+    location: String
+    story: String
+}
 input CreateUserInput {
     email: String!
     password: String!
@@ -31,14 +43,21 @@ input CreateUserInput {
     location: String
     story: String
     avatarUrl: Upload
+    changePassword : Int!
 }
-
 input UserLoginInput {
     account: String!
     password: String!
 }
-
+input changePasswordInput {
+    email: String!
+}
+type ConTact {
+    typeRelationship : Int
+    friendId : Int
+}
 type UserLoginResponse {
     token: String!
     user: User!
+    contact : ConTact!
 }

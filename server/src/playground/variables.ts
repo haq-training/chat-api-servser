@@ -20,4 +20,14 @@ export const variables = {
             role: 1,
         },
     },
+    updateUser: {
+        input: {
+            id : 1,
+            firstName : 'update',
+            lastName : 'demo-update',
+            location : 'update-localtion',
+            story : 'demo-story',
+            avratar : null,
+        },
+    },
 };

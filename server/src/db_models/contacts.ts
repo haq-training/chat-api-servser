@@ -5,8 +5,8 @@ import type { users, usersId } from './users';
 export interface contactsAttributes {
     id: number;
     userId: number;
-    friendId: number;
-    typeRelationship?: string;
+    friendId: number[];
+    typeRelationship?: number[];
     createdAt?: string;
     updatedAt?: string;
 }
@@ -16,6 +16,7 @@ export type contactsId = contacts[contactsPk];
 export type contactsOptionalAttributes =
     | 'id'
     | 'typeRelationship'
+    | 'friendId'
     | 'createdAt'
     | 'updatedAt';
 export type contactsCreationAttributes = Optional<
@@ -31,9 +32,9 @@ export class contacts
 
     userId!: number;
 
-    friendId!: number;
+    friendId!: number[];
 
-    typeRelationship?: string;
+    typeRelationship?: number[];
 
     createdAt?: string;
 
@@ -75,15 +76,11 @@ export class contacts
                     },
                 },
                 friendId: {
-                    type: DataTypes.INTEGER,
-                    allowNull: false,
-                    references: {
-                        model: 'users',
-                        key: 'id',
-                    },
+                    type: DataTypes.ARRAY(DataTypes.INTEGER),
+                    allowNull: true,
                 },
                 typeRelationship: {
-                    type: DataTypes.STRING(45),
+                    type: DataTypes.ARRAY(DataTypes.INTEGER),
                     allowNull: true,
                 },
                 createdAt: {

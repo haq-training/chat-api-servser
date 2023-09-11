@@ -15,6 +15,7 @@ export interface usersAttributes {
     location?: string;
     story?: string;
     role: number;
+    changePassword : number;
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -28,6 +29,7 @@ export type usersOptionalAttributes =
     | 'lastName'
     | 'location'
     | 'story'
+    | 'changePassword'
     | 'createdAt'
     | 'updatedAt';
 export type usersCreationAttributes = Optional<
@@ -58,6 +60,8 @@ export class users
     story?: string;
 
     role!: number;
+
+    changePassword!: number;
 
     createdAt?: Date;
 
@@ -219,6 +223,10 @@ export class users
                 },
                 password: {
                     type: DataTypes.STRING(200),
+                    allowNull: false,
+                },
+                changePassword : {
+                    type: DataTypes.INTEGER,
                     allowNull: false,
                 },
                 avatarUrl: {

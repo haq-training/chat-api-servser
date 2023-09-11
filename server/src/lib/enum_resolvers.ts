@@ -11,3 +11,9 @@ export const iRoleToNumber = (role: number) => {
             throw new InValidRoleError();
     }
 };
+export enum BucketValue {
+    ORIGINAL = 'original',
+    FINISHED = 'finished',
+    AVATAR = 'avatars',
+    TmCloudFiles = 'tm-cloud-files',
+}

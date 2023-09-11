@@ -5,8 +5,18 @@ schema {
     mutation: Mutation
 }
 
+type ConTact {
+    friendId: Int
+    typeRelationship: Int
+}
+
 type Mutation {
-    createUser(input: CreateUserInput!): User!
+    ChangePassword(input: changePasswordInput): SuccessResponse!
+    addFriend(id: ID!): SuccessResponse!
+    delete_user(id: ID!): SuccessResponse!
+    register(input: CreateUserInput!): User!
+    unFriend(id: ID!): SuccessResponse!
+    updateUser(input: UpdateUserInput!): SuccessResponse!
 }
 
 type PageInfo {
@@ -16,7 +26,8 @@ type PageInfo {
 
 type Query {
     login(input: UserLoginInput!): UserLoginResponse!
-    me: User!
+    user(id: ID!): User!
+    users: [User]
 }
 
 type User {
@@ -28,12 +39,13 @@ type User {
     lastName: String!
     location: String
     role: Int!
-    status: Int!
+    status: Boolean
     story: String
     updatedAt: Date
 }
 
 type UserLoginResponse {
+    contact: ConTact!
     token: String!
     user: User!
 }
@@ -58,7 +70,6 @@ input CreateUserInput {
     location: String
     password: String!
     role: Int!
-    status: Int!
     story: String
 }
 
@@ -69,7 +80,20 @@ input PaginationInput {
     last: Int
 }
 
+input UpdateUserInput {
+    avatar: Upload
+    firstName: String
+    id: Int!
+    lastName: String
+    location: String
+    story: String
+}
+
 input UserLoginInput {
     account: String!
     password: String!
+}
+
+input changePasswordInput {
+    email: String!
 }

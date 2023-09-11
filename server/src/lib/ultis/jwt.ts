@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { app } from '../../config/appConfig';
+import {UserNotFoundError} from '../classes/graphqlErrors';
 
 export interface USER_JWT {
     id: number;
@@ -7,25 +8,28 @@ export interface USER_JWT {
     avatarUrl?: string;
     firstName?: string;
     lastName?: string;
-    status?: boolean;
+    status: number;
     location?: string;
     story?: string;
     file?: string;
-    role: number;
+    role: string;
     createdAt?: string;
     updatedAt?: string;
 }
 
-export const generateJWT = (user: USER_JWT) => {
+export const generateJWT = (email : string ,id: number,role:number) => {
     const today = new Date();
     const expirationDate = new Date(today);
     expirationDate.setDate(today.getDate() + 60);
 
     return jwt.sign(
         {
-            ...user,
+            email,
+            id,
+            role,
             exp: parseInt((expirationDate.getTime() / 1000) as any, 10),
         },
         app.secretSign
     );
 };
+

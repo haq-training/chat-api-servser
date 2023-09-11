@@ -32,6 +32,8 @@ const login = importGraphqlString('./queries/authentication/login.graphql');
 
 const register = importGraphqlString('./mutations/register/register.graphql');
 
+const updateUser = importGraphqlString('./mutations/user/update.graphql');
+
 // const me = importGraphqlString('./queries/user/me.graphql');
 
 export const queryExample = async (
@@ -51,6 +53,13 @@ export const queryExample = async (
             name: 'Đăng ký',
             query: register,
             variables: prettifyJsonString(variables.register),
+            headers: userAuth,
+        },
+        {
+            endpoint: path,
+            name: 'sửa thông tin người dùng ',
+            query: updateUser,
+            variables: prettifyJsonString(variables.updateUser),
             headers: userAuth,
         },
     ];

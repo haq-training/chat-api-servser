@@ -51,6 +51,7 @@ export type IConTact = {
 
 export type ICreateUserInput = {
     avatarUrl?: InputMaybe<Scalars['Upload']['input']>;
+    changePassword: Scalars['Int']['input'];
     email: Scalars['String']['input'];
     firstName: Scalars['String']['input'];
     lastName: Scalars['String']['input'];
@@ -157,7 +158,6 @@ export type IUserLoginInput = {
 
 export type IUserLoginResponse = {
     __typename?: 'UserLoginResponse';
-    contact: IConTact;
     token: Scalars['String']['output'];
     user: IUser;
 };
@@ -475,7 +475,6 @@ export type IUserLoginResponseResolvers<
     ContextType = any,
     ParentType extends IResolversParentTypes['UserLoginResponse'] = IResolversParentTypes['UserLoginResponse']
 > = {
-    contact?: Resolver<IResolversTypes['ConTact'], ParentType, ContextType>;
     token?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
     user?: Resolver<IResolversTypes['User'], ParentType, ContextType>;
     __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;

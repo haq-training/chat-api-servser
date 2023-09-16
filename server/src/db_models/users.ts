@@ -1,7 +1,6 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model, Optional } from 'sequelize';
 import type { chat_members, chat_membersId } from './chat_members';
-import type { contacts, contactsId } from './contacts';
 import type { file, fileId } from './file';
 
 export interface usersAttributes {
@@ -112,76 +111,6 @@ export class users
     countChat_members!: Sequelize.HasManyCountAssociationsMixin;
 
     // users hasMany contacts via userId
-    contacts!: contacts[];
-
-    getContacts!: Sequelize.HasManyGetAssociationsMixin<contacts>;
-
-    setContacts!: Sequelize.HasManySetAssociationsMixin<contacts, contactsId>;
-
-    addContact!: Sequelize.HasManyAddAssociationMixin<contacts, contactsId>;
-
-    addContacts!: Sequelize.HasManyAddAssociationsMixin<contacts, contactsId>;
-
-    createContact!: Sequelize.HasManyCreateAssociationMixin<contacts>;
-
-    removeContact!: Sequelize.HasManyRemoveAssociationMixin<
-        contacts,
-        contactsId
-    >;
-
-    removeContacts!: Sequelize.HasManyRemoveAssociationsMixin<
-        contacts,
-        contactsId
-    >;
-
-    hasContact!: Sequelize.HasManyHasAssociationMixin<contacts, contactsId>;
-
-    hasContacts!: Sequelize.HasManyHasAssociationsMixin<contacts, contactsId>;
-
-    countContacts!: Sequelize.HasManyCountAssociationsMixin;
-
-    // users hasMany contacts via friendId
-    friend_contacts!: contacts[];
-
-    getFriend_contacts!: Sequelize.HasManyGetAssociationsMixin<contacts>;
-
-    setFriend_contacts!: Sequelize.HasManySetAssociationsMixin<
-        contacts,
-        contactsId
-    >;
-
-    addFriend_contact!: Sequelize.HasManyAddAssociationMixin<
-        contacts,
-        contactsId
-    >;
-
-    addFriend_contacts!: Sequelize.HasManyAddAssociationsMixin<
-        contacts,
-        contactsId
-    >;
-
-    createFriend_contact!: Sequelize.HasManyCreateAssociationMixin<contacts>;
-
-    removeFriend_contact!: Sequelize.HasManyRemoveAssociationMixin<
-        contacts,
-        contactsId
-    >;
-
-    removeFriend_contacts!: Sequelize.HasManyRemoveAssociationsMixin<
-        contacts,
-        contactsId
-    >;
-
-    hasFriend_contact!: Sequelize.HasManyHasAssociationMixin<
-        contacts,
-        contactsId
-    >;
-
-    hasFriend_contacts!: Sequelize.HasManyHasAssociationsMixin<
-        contacts,
-        contactsId
-    >;
-
     countFriend_contacts!: Sequelize.HasManyCountAssociationsMixin;
 
     // users hasMany file via uploadBy

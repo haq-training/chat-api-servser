@@ -52,12 +52,7 @@ input UserLoginInput {
 input changePasswordInput {
     email: String!
 }
-type ConTact {
-    typeRelationship : Int
-    friendId : Int
-}
 type UserLoginResponse {
     token: String!
     user: User!
-    contact : ConTact!
 }

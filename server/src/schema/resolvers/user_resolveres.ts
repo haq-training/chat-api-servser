@@ -53,14 +53,9 @@ const userResolver: IResolvers = {
             //         'lỗi data base !!! '
             //     ),
             // });
-            const contact : object = {
-                typeRelationship : 1,
-                friendId : 10
-            };
             return {
-                contact,
+                token,
                 user,
-                token
             };
         },
     },
@@ -98,6 +93,7 @@ const userResolver: IResolvers = {
                 role: iRoleToNumber(role),
                 location: location ?? undefined,
                 story: story ?? undefined,
+                changePassword : 0,
             };
 
             return await sequelize.transaction(async (t: Transaction) => {
@@ -183,57 +179,57 @@ const userResolver: IResolvers = {
 
             return ISuccessResponse.Success;
         },
-        addFriend: async (parent,{id},context)=>{
-            const {user} = context;
-            if (!context.isAuth) throw new AuthenticationError(context.error);
-             await db.users.findByPk(id, {
-                rejectOnEmpty: new UserNotFoundError(`User ID ${id} not found`),
-            });
-             const ListContact = await db.contacts.findByPk(user.id, {
-            });
-             if(ListContact){
-                 const NewFriend : number[] =ListContact.friendId;
-                 NewFriend.push(parseInt(id));
-                 await db.contacts.update({
-                     friendId : NewFriend,
-                 }, {
-                     where: {
-                         userId : user.id,
-                     }
-                 });
-             }else {
-                 const NewFriend : number[] = [parseInt(id)];
-                 await db.contacts.create({
-                     userId : user.id,
-                     friendId : NewFriend
-             });
-             }
-                     return ISuccessResponse.Success;
-        },
-        unFriend : async (parent,{id},context)=>{
-            const {user} = context;
-            if (!context.isAuth) throw new AuthenticationError(context.error);
-            await db.users.findByPk(id, {
-                rejectOnEmpty: new UserNotFoundError(`User ID ${id} not found`),
-            });
-            const ListContact = await db.contacts.findByPk(user.id, {
-            });
-            if(ListContact){
-                const listCt : number[] =ListContact.friendId;
-                const idUserRemove = parseInt(id);
-                const newContact = listCt.filter(item => item !== idUserRemove);
-                await db.contacts.update({
-                    friendId : newContact,
-                }, {
-                    where: {
-                        userId : user.id,
-                    }
-                });
-            }else {
-                throw new Error('Không tìm thấy bản ghi');
-            }
-            return ISuccessResponse.Success;
-        }
+        // addFriend: async (parent,{id},context)=>{
+        //     const {user} = context;
+        //     if (!context.isAuth) throw new AuthenticationError(context.error);
+        //      await db.users.findByPk(id, {
+        //         rejectOnEmpty: new UserNotFoundError(`User ID ${id} not found`),
+        //     });
+        //      const ListContact = await db.contacts.findByPk(user.id, {
+        //     });
+        //      if(ListContact){
+        //          const NewFriend : number[] =ListContact.friendId;
+        //          NewFriend.push(parseInt(id));
+        //          await db.contacts.update({
+        //              friendId : NewFriend,
+        //          }, {
+        //              where: {
+        //                  userId : user.id,
+        //              }
+        //          });
+        //      }else {
+        //          const NewFriend : number[] = [parseInt(id)];
+        //          await db.contacts.create({
+        //              userId : user.id,
+        //              friendId : NewFriend
+        //      });
+        //      }
+        //              return ISuccessResponse.Success;
+        // },
+        // unFriend : async (parent,{id},context)=>{
+        //     const {user} = context;
+        //     if (!context.isAuth) throw new AuthenticationError(context.error);
+        //     await db.users.findByPk(id, {
+        //         rejectOnEmpty: new UserNotFoundError(`User ID ${id} not found`),
+        //     });
+        //     const ListContact = await db.contacts.findByPk(user.id, {
+        //     });
+        //     if(ListContact){
+        //         const listCt : number[] =ListContact.friendId;
+        //         const idUserRemove = parseInt(id);
+        //         const newContact = listCt.filter(item => item !== idUserRemove);
+        //         await db.contacts.update({
+        //             friendId : newContact,
+        //         }, {
+        //             where: {
+        //                 userId : user.id,
+        //             }
+        //         });
+        //     }else {
+        //         throw new Error('Không tìm thấy bản ghi');
+        //     }
+        //     return ISuccessResponse.Success;
+        // }
 //         ChangePassword : async (parent,{input},context)=>{
 //
 // }

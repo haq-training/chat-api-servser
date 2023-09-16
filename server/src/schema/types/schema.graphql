@@ -5,11 +5,6 @@ schema {
     mutation: Mutation
 }
 
-type ConTact {
-    friendId: Int
-    typeRelationship: Int
-}
-
 type Mutation {
     ChangePassword(input: changePasswordInput): SuccessResponse!
     addFriend(id: ID!): SuccessResponse!
@@ -45,7 +40,6 @@ type User {
 }
 
 type UserLoginResponse {
-    contact: ConTact!
     token: String!
     user: User!
 }
@@ -64,6 +58,7 @@ scalar Upload
 
 input CreateUserInput {
     avatarUrl: Upload
+    changePassword: Int!
     email: String!
     firstName: String!
     lastName: String!

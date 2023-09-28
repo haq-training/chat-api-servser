@@ -9,10 +9,10 @@ import { generateJWT } from '../../lib/ultis/jwt';
 import { db, sequelize } from '../../db_loaders/mysql';
 import { storageConfig } from '../../config/appConfig';
 import { minIOServices } from '../../lib/classes';
-import { ChatContext } from '../../server';
+// import { ChatContext } from '../../server';
 import { usersCreationAttributes } from '../../db_models/users';
 import { DefaultHashValue } from '../../lib/enum';
-import { checkAuthentication } from '../../lib/ultis/permision';
+// import { checkAuthentication } from '../../lib/ultis/permision';
 import {iRoleToNumber} from '../../lib/enum_resolvers';
 
 const userResolver: IResolvers = {
@@ -44,15 +44,8 @@ const userResolver: IResolvers = {
             if (!checkPassword) {
                 throw new UserNotFoundError('Sai mật khẩu!!!');
             }
+            console.log('role',user.role);
             const token = generateJWT(user.email,user.id,user.role);
-            // const userContact = await db.contacts.findOne({
-            //     where: {
-            //         userId: user.id,
-            //     },
-            //     rejectOnEmpty: new UserNotFoundError(
-            //         'lỗi data base !!! '
-            //     ),
-            // });
             return {
                 token,
                 user,
@@ -60,8 +53,7 @@ const userResolver: IResolvers = {
         },
     },
     Mutation: {
-        register: async (parent, { input }, context: ChatContext) => {
-            checkAuthentication(context);
+        register: async (parent, { input }) => {
             const {
                 email,
                 password,

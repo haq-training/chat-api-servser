@@ -27,7 +27,7 @@ export const variables = {
             lastName : 'demo-update',
             location : 'update-localtion',
             story : 'demo-story',
-            avratar : null,
+            avatar : null,
         },
     },
 };

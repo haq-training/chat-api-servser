@@ -43,7 +43,6 @@ input CreateUserInput {
     location: String
     story: String
     avatarUrl: Upload
-    changePassword : Int!
 }
 input UserLoginInput {
     account: String!

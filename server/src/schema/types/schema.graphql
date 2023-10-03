@@ -11,6 +11,7 @@ type Mutation {
     delete_user(id: ID!): SuccessResponse!
     register(input: CreateUserInput!): User!
     unFriend(id: ID!): SuccessResponse!
+    upRoleUser(id: ID!): SuccessResponse!
     updateUser(input: UpdateUserInput!): SuccessResponse!
 }
 
@@ -58,7 +59,6 @@ scalar Upload
 
 input CreateUserInput {
     avatarUrl: Upload
-    changePassword: Int!
     email: String!
     firstName: String!
     lastName: String!

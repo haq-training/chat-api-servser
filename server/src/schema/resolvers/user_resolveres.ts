@@ -1,6 +1,7 @@
-// eslint-disable-next-line import/extensions,@typescript-eslint/ban-ts-comment
-// @ts-ignore
-// eslint-disable-next-line import/extensions
+/* eslint-disable linebreak-style */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable linebreak-style */
+
 import bcrypt from 'bcrypt';
 import { Transaction } from 'sequelize';
 import { IResolvers,ISuccessResponse } from '../../__generated__/graphql';
@@ -18,19 +19,19 @@ import {iRoleToNumber} from '../../lib/enum_resolvers';
 const userResolver: IResolvers = {
     Query: {
         // eslint-disable-next-line no-empty-pattern
-        users: async (parent,{}, context) => {
+        users: async (_parent,{}, context) => {
             if (!context.isAuth) throw new AuthenticationError(context.error);
             return await db.users.findAll().catch((error) => {
                 throw new MySQLError(`Error: ${error.message}`);
             });
         },
-        user: async (parent, { id }, context) => {
+        user: async (_parent, { id }, context) => {
             if (!context.isAuth) throw new AuthenticationError(context.error);
             return await db.users.findByPk(id, {
                 rejectOnEmpty: new UserNotFoundError(`User ID ${id} not found`),
             });
         },
-        login: async (parent, { input }) => {
+        login: async (_parent, { input }) => {
             const { account, password } = input;
             const user = await db.users.findOne({
                 where: {
@@ -53,7 +54,7 @@ const userResolver: IResolvers = {
         },
     },
     Mutation: {
-        register: async (parent, { input }) => {
+        register: async (_parent, { input }) => {
             const {
                 email,
                 password,
@@ -116,7 +117,7 @@ const userResolver: IResolvers = {
                 }
             });
         },
-        updateUser : async (parent,{input},context)=>{
+        updateUser : async (_parent,{input},context)=>{
             const {user} = context;
             if(!context.isAuth) throw new UserNotFoundError(context.error);
             const {
@@ -127,6 +128,7 @@ const userResolver: IResolvers = {
                 location,
                 story,
             } = input;
+            if(user.id !== id) throw new UserNotFoundError(context.error);
 
             const CheckUserUpdate = await db.users.findByPk(id, {
                 rejectOnEmpty: new UserNotFoundError(),
@@ -171,60 +173,25 @@ const userResolver: IResolvers = {
 
             return ISuccessResponse.Success;
         },
-        // addFriend: async (parent,{id},context)=>{
-        //     const {user} = context;
-        //     if (!context.isAuth) throw new AuthenticationError(context.error);
-        //      await db.users.findByPk(id, {
-        //         rejectOnEmpty: new UserNotFoundError(`User ID ${id} not found`),
-        //     });
-        //      const ListContact = await db.contacts.findByPk(user.id, {
-        //     });
-        //      if(ListContact){
-        //          const NewFriend : number[] =ListContact.friendId;
-        //          NewFriend.push(parseInt(id));
-        //          await db.contacts.update({
-        //              friendId : NewFriend,
-        //          }, {
-        //              where: {
-        //                  userId : user.id,
-        //              }
-        //          });
-        //      }else {
-        //          const NewFriend : number[] = [parseInt(id)];
-        //          await db.contacts.create({
-        //              userId : user.id,
-        //              friendId : NewFriend
-        //      });
-        //      }
-        //              return ISuccessResponse.Success;
-        // },
-        // unFriend : async (parent,{id},context)=>{
-        //     const {user} = context;
-        //     if (!context.isAuth) throw new AuthenticationError(context.error);
-        //     await db.users.findByPk(id, {
-        //         rejectOnEmpty: new UserNotFoundError(`User ID ${id} not found`),
-        //     });
-        //     const ListContact = await db.contacts.findByPk(user.id, {
-        //     });
-        //     if(ListContact){
-        //         const listCt : number[] =ListContact.friendId;
-        //         const idUserRemove = parseInt(id);
-        //         const newContact = listCt.filter(item => item !== idUserRemove);
-        //         await db.contacts.update({
-        //             friendId : newContact,
-        //         }, {
-        //             where: {
-        //                 userId : user.id,
-        //             }
-        //         });
-        //     }else {
-        //         throw new Error('Không tìm thấy bản ghi');
-        //     }
-        //     return ISuccessResponse.Success;
-        // }
-//         ChangePassword : async (parent,{input},context)=>{
-//
-// }
+        upRoleUser : async  (_parent ,{id} ,context)=>{
+            const {user} = context;
+            if (!context.isAuth) throw new AuthenticationError(context.error);
+            if(user.role !== false) throw new Error('khong co quyen update role user');
+            const CheckUserUpdate = await db.users.findByPk(id, {
+                rejectOnEmpty: new UserNotFoundError(),
+            });
+            CheckUserUpdate.role = 0;
+            await sequelize.transaction(async (t: Transaction) => {
+                try {
+                    await CheckUserUpdate.save({ transaction: t });
+                } catch (error) {
+                    await t.rollback();
+                    throw new MySQLError('Update User Fail');
+                }
+            });
+            return ISuccessResponse.Success;
+        }
+
      },
 };
 export default userResolver;

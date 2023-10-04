@@ -56,7 +56,10 @@ export default class PubSubService {
 
     asyncIteratorByUser(userId: usersId, key: IUserEvent) {
         const triggerName = `${key}-${userId}`;
-        return this.pubsub.asyncIterator(triggerName);
+        return {
+            [Symbol.asyncIterator]: () =>
+                this.pubsub.asyncIterator(triggerName),
+        };
     }
 
     sendOnlineMessage(message: UserOnline, userIds: number | number[]) {

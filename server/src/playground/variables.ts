@@ -29,5 +29,33 @@ export const variables = {
             story : 'demo-story',
             avatar : null,
         },
+
     },
+    upRoleUser: {
+            id : 2
+    },
+    delete_user: {
+        input: {
+            id : 10,
+        },
+    },
+    ChangePassword: {
+        input: {
+            id : 2,
+            new_passWord : '98765',
+            old_passWord : passwordForLogin
+        },
+    },
+    forgot_password: {
+        input: {
+            gmail : 'dvc123@gmail.com'
+        },
+    },
+    user: {
+       id : 2
+    },
+    users: {
+    },
+
+
 };

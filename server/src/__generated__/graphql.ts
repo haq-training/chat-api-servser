@@ -43,15 +43,8 @@ export type Scalars = {
     Upload: { input: any; output: any };
 };
 
-export type IConTact = {
-    __typename?: 'ConTact';
-    friendId?: Maybe<Scalars['Int']['output']>;
-    typeRelationship?: Maybe<Scalars['Int']['output']>;
-};
-
 export type ICreateUserInput = {
     avatarUrl?: InputMaybe<Scalars['Upload']['input']>;
-    changePassword: Scalars['Int']['input'];
     email: Scalars['String']['input'];
     firstName: Scalars['String']['input'];
     lastName: Scalars['String']['input'];
@@ -61,18 +54,24 @@ export type ICreateUserInput = {
     story?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type IForgotPassword = {
+    gmail: Scalars['String']['input'];
+};
+
 export type IMutation = {
     __typename?: 'Mutation';
     ChangePassword: ISuccessResponse;
     addFriend: ISuccessResponse;
     delete_user: ISuccessResponse;
+    forgot_password: ISuccessResponse;
     register: IUser;
     unFriend: ISuccessResponse;
+    upRoleUser: ISuccessResponse;
     updateUser: ISuccessResponse;
 };
 
 export type IMutationChangePasswordArgs = {
-    input?: InputMaybe<IChangePasswordInput>;
+    input: IChangePasswordInput;
 };
 
 export type IMutationAddFriendArgs = {
@@ -83,11 +82,19 @@ export type IMutationDelete_UserArgs = {
     id: Scalars['ID']['input'];
 };
 
+export type IMutationForgot_PasswordArgs = {
+    input: IForgotPassword;
+};
+
 export type IMutationRegisterArgs = {
     input: ICreateUserInput;
 };
 
 export type IMutationUnFriendArgs = {
+    id: Scalars['ID']['input'];
+};
+
+export type IMutationUpRoleUserArgs = {
     id: Scalars['ID']['input'];
 };
 
@@ -163,7 +170,9 @@ export type IUserLoginResponse = {
 };
 
 export type IChangePasswordInput = {
-    email: Scalars['String']['input'];
+    id: Scalars['ID']['input'];
+    new_passWord: Scalars['String']['input'];
+    old_passWord: Scalars['String']['input'];
 };
 
 export type ResolverTypeWrapper<T> = Promise<T> | T;
@@ -274,10 +283,10 @@ export type DirectiveResolverFn<
 /** Mapping between all available schema types and the resolvers types */
 export type IResolversTypes = {
     Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
-    ConTact: ResolverTypeWrapper<IConTact>;
     CreateUserInput: ICreateUserInput;
     Cursor: ResolverTypeWrapper<Scalars['Cursor']['output']>;
     Date: ResolverTypeWrapper<Scalars['Date']['output']>;
+    ForgotPassword: IForgotPassword;
     ID: ResolverTypeWrapper<Scalars['ID']['output']>;
     Int: ResolverTypeWrapper<Scalars['Int']['output']>;
     JSON: ResolverTypeWrapper<Scalars['JSON']['output']>;
@@ -300,10 +309,10 @@ export type IResolversTypes = {
 /** Mapping between all available schema types and the resolvers parents */
 export type IResolversParentTypes = {
     Boolean: Scalars['Boolean']['output'];
-    ConTact: IConTact;
     CreateUserInput: ICreateUserInput;
     Cursor: Scalars['Cursor']['output'];
     Date: Scalars['Date']['output'];
+    ForgotPassword: IForgotPassword;
     ID: Scalars['ID']['output'];
     Int: Scalars['Int']['output'];
     JSON: Scalars['JSON']['output'];
@@ -320,19 +329,6 @@ export type IResolversParentTypes = {
         user: IResolversParentTypes['User'];
     };
     changePasswordInput: IChangePasswordInput;
-};
-
-export type IConTactResolvers<
-    ContextType = any,
-    ParentType extends IResolversParentTypes['ConTact'] = IResolversParentTypes['ConTact']
-> = {
-    friendId?: Resolver<Maybe<IResolversTypes['Int']>, ParentType, ContextType>;
-    typeRelationship?: Resolver<
-        Maybe<IResolversTypes['Int']>,
-        ParentType,
-        ContextType
-    >;
-    __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export interface ICursorScalarConfig
@@ -358,7 +354,7 @@ export type IMutationResolvers<
         IResolversTypes['SuccessResponse'],
         ParentType,
         ContextType,
-        Partial<IMutationChangePasswordArgs>
+        RequireFields<IMutationChangePasswordArgs, 'input'>
     >;
     addFriend?: Resolver<
         IResolversTypes['SuccessResponse'],
@@ -372,6 +368,12 @@ export type IMutationResolvers<
         ContextType,
         RequireFields<IMutationDelete_UserArgs, 'id'>
     >;
+    forgot_password?: Resolver<
+        IResolversTypes['SuccessResponse'],
+        ParentType,
+        ContextType,
+        RequireFields<IMutationForgot_PasswordArgs, 'input'>
+    >;
     register?: Resolver<
         IResolversTypes['User'],
         ParentType,
@@ -383,6 +385,12 @@ export type IMutationResolvers<
         ParentType,
         ContextType,
         RequireFields<IMutationUnFriendArgs, 'id'>
+    >;
+    upRoleUser?: Resolver<
+        IResolversTypes['SuccessResponse'],
+        ParentType,
+        ContextType,
+        RequireFields<IMutationUpRoleUserArgs, 'id'>
     >;
     updateUser?: Resolver<
         IResolversTypes['SuccessResponse'],
@@ -481,7 +489,6 @@ export type IUserLoginResponseResolvers<
 };
 
 export type IResolvers<ContextType = any> = {
-    ConTact?: IConTactResolvers<ContextType>;
     Cursor?: GraphQLScalarType;
     Date?: GraphQLScalarType;
     JSON?: GraphQLScalarType;

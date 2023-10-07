@@ -6,9 +6,10 @@ schema {
 }
 
 type Mutation {
-    ChangePassword(input: changePasswordInput): SuccessResponse!
+    ChangePassword(input: changePasswordInput!): SuccessResponse!
     addFriend(id: ID!): SuccessResponse!
     delete_user(id: ID!): SuccessResponse!
+    forgot_password(input: ForgotPassword!): SuccessResponse!
     register(input: CreateUserInput!): User!
     unFriend(id: ID!): SuccessResponse!
     upRoleUser(id: ID!): SuccessResponse!
@@ -68,6 +69,10 @@ input CreateUserInput {
     story: String
 }
 
+input ForgotPassword {
+    gmail: String!
+}
+
 input PaginationInput {
     after: Cursor
     before: Cursor
@@ -90,5 +95,7 @@ input UserLoginInput {
 }
 
 input changePasswordInput {
-    email: String!
+    id: ID!
+    new_passWord: String!
+    old_passWord: String!
 }

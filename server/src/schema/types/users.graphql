@@ -10,8 +10,9 @@ extend type Mutation {
     upRoleUser(id:ID!):SuccessResponse!
     addFriend(id:ID!):SuccessResponse!
     unFriend(id:ID!):SuccessResponse!
-    ChangePassword(input : changePasswordInput):SuccessResponse!
+    ChangePassword(input : changePasswordInput!):SuccessResponse!
     delete_user(id:ID!):SuccessResponse!
+    forgot_password(input : ForgotPassword!):SuccessResponse!
 }
 
 type User {
@@ -50,9 +51,15 @@ input UserLoginInput {
     password: String!
 }
 input changePasswordInput {
-    email: String!
+    id :ID!
+    new_passWord : String!
+    old_passWord : String!
+
 }
 type UserLoginResponse {
     token: String!
     user: User!
+}
+input ForgotPassword {
+    gmail : String!
 }

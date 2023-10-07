@@ -1,0 +1,3 @@
+mutation upRoleUser($id: ID!) {
+    upRoleUser(id: $id)
+}

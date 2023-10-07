@@ -8,6 +8,12 @@ extend type Mutation {
     register(input: CreateUserInput!): User!
 }
 
+
+extend type Subscription {
+    onlineTracker(userId: Int!): UserOnline!
+}
+
+
 type User {
     id: Int!
     email: String!
@@ -41,4 +47,9 @@ input UserLoginInput {
 type UserLoginResponse {
     token: String!
     user: User!
+}
+
+type UserOnline {
+    id: Int
+    body: String
 }

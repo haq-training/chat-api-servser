@@ -86,6 +86,15 @@ export type IQueryLoginArgs = {
     input: IUserLoginInput;
 };
 
+export type ISubscription = {
+    __typename?: 'Subscription';
+    onlineTracker: IUserOnline;
+};
+
+export type ISubscriptionOnlineTrackerArgs = {
+    userId: Scalars['Int']['input'];
+};
+
 export enum ISuccessResponse {
     Success = 'success',
 }
@@ -114,6 +123,12 @@ export type IUserLoginResponse = {
     __typename?: 'UserLoginResponse';
     token: Scalars['String']['output'];
     user: IUser;
+};
+
+export type IUserOnline = {
+    __typename?: 'UserOnline';
+    body?: Maybe<Scalars['String']['output']>;
+    id?: Maybe<Scalars['Int']['output']>;
 };
 
 export type ResolverTypeWrapper<T> = Promise<T> | T;
@@ -234,6 +249,7 @@ export type IResolversTypes = {
     PaginationInput: IPaginationInput;
     Query: ResolverTypeWrapper<{}>;
     String: ResolverTypeWrapper<Scalars['String']['output']>;
+    Subscription: ResolverTypeWrapper<{}>;
     SuccessResponse: ISuccessResponse;
     Upload: ResolverTypeWrapper<Scalars['Upload']['output']>;
     User: ResolverTypeWrapper<users>;
@@ -241,6 +257,7 @@ export type IResolversTypes = {
     UserLoginResponse: ResolverTypeWrapper<
         Omit<IUserLoginResponse, 'user'> & { user: IResolversTypes['User'] }
     >;
+    UserOnline: ResolverTypeWrapper<IUserOnline>;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -256,12 +273,14 @@ export type IResolversParentTypes = {
     PaginationInput: IPaginationInput;
     Query: {};
     String: Scalars['String']['output'];
+    Subscription: {};
     Upload: Scalars['Upload']['output'];
     User: users;
     UserLoginInput: IUserLoginInput;
     UserLoginResponse: Omit<IUserLoginResponse, 'user'> & {
         user: IResolversParentTypes['User'];
     };
+    UserOnline: IUserOnline;
 };
 
 export interface ICursorScalarConfig
@@ -317,6 +336,19 @@ export type IQueryResolvers<
     me?: Resolver<IResolversTypes['User'], ParentType, ContextType>;
 };
 
+export type ISubscriptionResolvers<
+    ContextType = any,
+    ParentType extends IResolversParentTypes['Subscription'] = IResolversParentTypes['Subscription']
+> = {
+    onlineTracker?: SubscriptionResolver<
+        IResolversTypes['UserOnline'],
+        'onlineTracker',
+        ParentType,
+        ContextType,
+        RequireFields<ISubscriptionOnlineTrackerArgs, 'userId'>
+    >;
+};
+
 export interface IUploadScalarConfig
     extends GraphQLScalarTypeConfig<IResolversTypes['Upload'], any> {
     name: 'Upload';
@@ -369,6 +401,15 @@ export type IUserLoginResponseResolvers<
     __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type IUserOnlineResolvers<
+    ContextType = any,
+    ParentType extends IResolversParentTypes['UserOnline'] = IResolversParentTypes['UserOnline']
+> = {
+    body?: Resolver<Maybe<IResolversTypes['String']>, ParentType, ContextType>;
+    id?: Resolver<Maybe<IResolversTypes['Int']>, ParentType, ContextType>;
+    __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type IResolvers<ContextType = any> = {
     Cursor?: GraphQLScalarType;
     Date?: GraphQLScalarType;
@@ -376,7 +417,9 @@ export type IResolvers<ContextType = any> = {
     Mutation?: IMutationResolvers<ContextType>;
     PageInfo?: IPageInfoResolvers<ContextType>;
     Query?: IQueryResolvers<ContextType>;
+    Subscription?: ISubscriptionResolvers<ContextType>;
     Upload?: GraphQLScalarType;
     User?: IUserResolvers<ContextType>;
     UserLoginResponse?: IUserLoginResponseResolvers<ContextType>;
+    UserOnline?: IUserOnlineResolvers<ContextType>;
 };

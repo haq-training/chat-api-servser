@@ -1,0 +1,34 @@
+query {
+    listFriend {
+        friend {
+            id
+            email
+            firstName
+            lastName
+            avatarUrl
+            status
+            location
+            story
+        }
+        block {
+            id
+            email
+            firstName
+            lastName
+            avatarUrl
+            status
+            location
+            story
+        }
+        follower {
+            id
+            email
+            firstName
+            lastName
+            avatarUrl
+            status
+            location
+            story
+        }
+    }
+}

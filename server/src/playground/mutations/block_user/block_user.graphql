@@ -1,0 +1,3 @@
+mutation block_user($id: ID!) {
+    block_user(id: $id)
+}

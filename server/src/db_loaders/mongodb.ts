@@ -1,5 +1,5 @@
 /* eslint-disable import/extensions */
-import mongoose from 'mongoose';
+import mongoose, { ConnectOptions } from 'mongoose';
 import * as dotenv from 'dotenv';
 import { database } from '../config/appConfig';
 import chatMessage from '../mongodb_models/chatMessage';
@@ -10,22 +10,23 @@ dotenv.config();
 export const mongoLoader = async () => {
     await mongoose
         .connect(database.MONGODB.uri, {
-            socketTimeoutMS: 1000,
-        })
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        } as ConnectOptions)
         .then(() => {
             console.log('Mongo DB connected ');
         })
         .then(async () => {
             if (process.env.NODE_ENV === 'development') {
-                chatMessageData.forEach((element) =>
-                    chatMessage.findOneAndUpdate(
-                        element as any,
-                        { element },
+                for (const element of chatMessageData) {
+                    await chatMessage.findOneAndUpdate(
+                        { _id: element._id },
+                        element,
                         {
                             upsert: true,
                         }
-                    )
-                );
+                    );
+                }
                 console.log('Insert success');
             }
         })

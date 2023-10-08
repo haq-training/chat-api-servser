@@ -1,0 +1,3 @@
+mutation unFriend($id: ID!) {
+    unFriend(id: $id)
+}

@@ -58,14 +58,22 @@ export type IForgotPassword = {
     gmail: Scalars['String']['input'];
 };
 
+export type IFriendRequest = {
+    __typename?: 'FriendRequest';
+    message?: Maybe<Scalars['String']['output']>;
+    senderId: Scalars['Int']['output'];
+};
+
 export type IMutation = {
     __typename?: 'Mutation';
     ChangePassword: ISuccessResponse;
     addFriend: ISuccessResponse;
+    block_user: ISuccessResponse;
     delete_user: ISuccessResponse;
     forgot_password: ISuccessResponse;
     register: IUser;
     unFriend: ISuccessResponse;
+    unblock_user: ISuccessResponse;
     upRoleUser: ISuccessResponse;
     updateUser: ISuccessResponse;
 };
@@ -75,6 +83,10 @@ export type IMutationChangePasswordArgs = {
 };
 
 export type IMutationAddFriendArgs = {
+    email: Scalars['String']['input'];
+};
+
+export type IMutationBlock_UserArgs = {
     id: Scalars['ID']['input'];
 };
 
@@ -91,6 +103,10 @@ export type IMutationRegisterArgs = {
 };
 
 export type IMutationUnFriendArgs = {
+    id: Scalars['ID']['input'];
+};
+
+export type IMutationUnblock_UserArgs = {
     id: Scalars['ID']['input'];
 };
 
@@ -117,7 +133,9 @@ export type IPaginationInput = {
 
 export type IQuery = {
     __typename?: 'Query';
+    listFriend?: Maybe<IList_All_Friend>;
     login: IUserLoginResponse;
+    me: IUser;
     user: IUser;
     users?: Maybe<Array<Maybe<IUser>>>;
 };
@@ -126,17 +144,22 @@ export type IQueryLoginArgs = {
     input: IUserLoginInput;
 };
 
+export type IQueryUserArgs = {
+    id: Scalars['ID']['input'];
+};
+
 export type ISubscription = {
     __typename?: 'Subscription';
+    friendRequestReceived?: Maybe<IFriendRequest>;
     onlineTracker: IUserOnline;
+};
+
+export type ISubscriptionFriendRequestReceivedArgs = {
+    userId: Scalars['Int']['input'];
 };
 
 export type ISubscriptionOnlineTrackerArgs = {
     userId: Scalars['Int']['input'];
-};
-
-export type IQueryUserArgs = {
-    id: Scalars['ID']['input'];
 };
 
 export enum ISuccessResponse {
@@ -188,6 +211,25 @@ export type IChangePasswordInput = {
     id: Scalars['ID']['input'];
     new_passWord: Scalars['String']['input'];
     old_passWord: Scalars['String']['input'];
+};
+
+export type IList_Friend = {
+    __typename?: 'list_Friend';
+    avatarUrl?: Maybe<Scalars['String']['output']>;
+    email: Scalars['String']['output'];
+    firstName: Scalars['String']['output'];
+    id: Scalars['Int']['output'];
+    lastName: Scalars['String']['output'];
+    location?: Maybe<Scalars['String']['output']>;
+    status?: Maybe<Scalars['Boolean']['output']>;
+    story?: Maybe<Scalars['String']['output']>;
+};
+
+export type IList_All_Friend = {
+    __typename?: 'list_all_friend';
+    block?: Maybe<Array<Maybe<IList_Friend>>>;
+    follower?: Maybe<Array<Maybe<IList_Friend>>>;
+    friend?: Maybe<Array<Maybe<IList_Friend>>>;
 };
 
 export type ResolverTypeWrapper<T> = Promise<T> | T;
@@ -302,6 +344,7 @@ export type IResolversTypes = {
     Cursor: ResolverTypeWrapper<Scalars['Cursor']['output']>;
     Date: ResolverTypeWrapper<Scalars['Date']['output']>;
     ForgotPassword: IForgotPassword;
+    FriendRequest: ResolverTypeWrapper<IFriendRequest>;
     ID: ResolverTypeWrapper<Scalars['ID']['output']>;
     Int: ResolverTypeWrapper<Scalars['Int']['output']>;
     JSON: ResolverTypeWrapper<Scalars['JSON']['output']>;
@@ -321,6 +364,8 @@ export type IResolversTypes = {
     >;
     UserOnline: ResolverTypeWrapper<IUserOnline>;
     changePasswordInput: IChangePasswordInput;
+    list_Friend: ResolverTypeWrapper<IList_Friend>;
+    list_all_friend: ResolverTypeWrapper<IList_All_Friend>;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -330,6 +375,7 @@ export type IResolversParentTypes = {
     Cursor: Scalars['Cursor']['output'];
     Date: Scalars['Date']['output'];
     ForgotPassword: IForgotPassword;
+    FriendRequest: IFriendRequest;
     ID: Scalars['ID']['output'];
     Int: Scalars['Int']['output'];
     JSON: Scalars['JSON']['output'];
@@ -348,6 +394,8 @@ export type IResolversParentTypes = {
     };
     UserOnline: IUserOnline;
     changePasswordInput: IChangePasswordInput;
+    list_Friend: IList_Friend;
+    list_all_friend: IList_All_Friend;
 };
 
 export interface ICursorScalarConfig
@@ -359,6 +407,19 @@ export interface IDateScalarConfig
     extends GraphQLScalarTypeConfig<IResolversTypes['Date'], any> {
     name: 'Date';
 }
+
+export type IFriendRequestResolvers<
+    ContextType = any,
+    ParentType extends IResolversParentTypes['FriendRequest'] = IResolversParentTypes['FriendRequest']
+> = {
+    message?: Resolver<
+        Maybe<IResolversTypes['String']>,
+        ParentType,
+        ContextType
+    >;
+    senderId?: Resolver<IResolversTypes['Int'], ParentType, ContextType>;
+    __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
 
 export interface IJsonScalarConfig
     extends GraphQLScalarTypeConfig<IResolversTypes['JSON'], any> {
@@ -379,7 +440,13 @@ export type IMutationResolvers<
         IResolversTypes['SuccessResponse'],
         ParentType,
         ContextType,
-        RequireFields<IMutationAddFriendArgs, 'id'>
+        RequireFields<IMutationAddFriendArgs, 'email'>
+    >;
+    block_user?: Resolver<
+        IResolversTypes['SuccessResponse'],
+        ParentType,
+        ContextType,
+        RequireFields<IMutationBlock_UserArgs, 'id'>
     >;
     delete_user?: Resolver<
         IResolversTypes['SuccessResponse'],
@@ -404,6 +471,12 @@ export type IMutationResolvers<
         ParentType,
         ContextType,
         RequireFields<IMutationUnFriendArgs, 'id'>
+    >;
+    unblock_user?: Resolver<
+        IResolversTypes['SuccessResponse'],
+        ParentType,
+        ContextType,
+        RequireFields<IMutationUnblock_UserArgs, 'id'>
     >;
     upRoleUser?: Resolver<
         IResolversTypes['SuccessResponse'],
@@ -436,12 +509,18 @@ export type IQueryResolvers<
     ContextType = any,
     ParentType extends IResolversParentTypes['Query'] = IResolversParentTypes['Query']
 > = {
+    listFriend?: Resolver<
+        Maybe<IResolversTypes['list_all_friend']>,
+        ParentType,
+        ContextType
+    >;
     login?: Resolver<
         IResolversTypes['UserLoginResponse'],
         ParentType,
         ContextType,
         RequireFields<IQueryLoginArgs, 'input'>
     >;
+    me?: Resolver<IResolversTypes['User'], ParentType, ContextType>;
     user?: Resolver<
         IResolversTypes['User'],
         ParentType,
@@ -459,6 +538,13 @@ export type ISubscriptionResolvers<
     ContextType = any,
     ParentType extends IResolversParentTypes['Subscription'] = IResolversParentTypes['Subscription']
 > = {
+    friendRequestReceived?: SubscriptionResolver<
+        Maybe<IResolversTypes['FriendRequest']>,
+        'friendRequestReceived',
+        ParentType,
+        ContextType,
+        RequireFields<ISubscriptionFriendRequestReceivedArgs, 'userId'>
+    >;
     onlineTracker?: SubscriptionResolver<
         IResolversTypes['UserOnline'],
         'onlineTracker',
@@ -529,9 +615,59 @@ export type IUserOnlineResolvers<
     __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type IList_FriendResolvers<
+    ContextType = any,
+    ParentType extends IResolversParentTypes['list_Friend'] = IResolversParentTypes['list_Friend']
+> = {
+    avatarUrl?: Resolver<
+        Maybe<IResolversTypes['String']>,
+        ParentType,
+        ContextType
+    >;
+    email?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
+    firstName?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
+    id?: Resolver<IResolversTypes['Int'], ParentType, ContextType>;
+    lastName?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
+    location?: Resolver<
+        Maybe<IResolversTypes['String']>,
+        ParentType,
+        ContextType
+    >;
+    status?: Resolver<
+        Maybe<IResolversTypes['Boolean']>,
+        ParentType,
+        ContextType
+    >;
+    story?: Resolver<Maybe<IResolversTypes['String']>, ParentType, ContextType>;
+    __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type IList_All_FriendResolvers<
+    ContextType = any,
+    ParentType extends IResolversParentTypes['list_all_friend'] = IResolversParentTypes['list_all_friend']
+> = {
+    block?: Resolver<
+        Maybe<Array<Maybe<IResolversTypes['list_Friend']>>>,
+        ParentType,
+        ContextType
+    >;
+    follower?: Resolver<
+        Maybe<Array<Maybe<IResolversTypes['list_Friend']>>>,
+        ParentType,
+        ContextType
+    >;
+    friend?: Resolver<
+        Maybe<Array<Maybe<IResolversTypes['list_Friend']>>>,
+        ParentType,
+        ContextType
+    >;
+    __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type IResolvers<ContextType = any> = {
     Cursor?: GraphQLScalarType;
     Date?: GraphQLScalarType;
+    FriendRequest?: IFriendRequestResolvers<ContextType>;
     JSON?: GraphQLScalarType;
     Mutation?: IMutationResolvers<ContextType>;
     PageInfo?: IPageInfoResolvers<ContextType>;
@@ -541,4 +677,6 @@ export type IResolvers<ContextType = any> = {
     User?: IUserResolvers<ContextType>;
     UserLoginResponse?: IUserLoginResponseResolvers<ContextType>;
     UserOnline?: IUserOnlineResolvers<ContextType>;
+    list_Friend?: IList_FriendResolvers<ContextType>;
+    list_all_friend?: IList_All_FriendResolvers<ContextType>;
 };

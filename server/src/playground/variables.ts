@@ -32,12 +32,10 @@ export const variables = {
 
     },
     upRoleUser: {
-            id : 2
+        id : 2
     },
     delete_user: {
-        input: {
-            id : 10,
-        },
+        id : 5,
     },
     ChangePassword: {
         input: {
@@ -52,10 +50,28 @@ export const variables = {
         },
     },
     user: {
-       id : 2
+        id : 2
     },
     users: {
     },
+    me: {
+    },
+    listFriend: {
+    },
+    addFriend: {
+        email : 'nataliemayreed@live.com',
+    },
+    unFriend: {
+        id : 3,
+    },
+    block_user: {
+        id : 7,
+    },
+    unblock_user: {
+        id : 7,
+    },
+
+
 
 
 };

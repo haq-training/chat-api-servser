@@ -2,25 +2,36 @@ extend type Query {
     users: [User]
     user(id:ID!): User!
     login(input: UserLoginInput!): UserLoginResponse!
+    me:User!
+    listFriend : list_all_friend
 }
 
 extend type Mutation {
     register(input: CreateUserInput!): User!
     updateUser(input:UpdateUserInput!):SuccessResponse!
     upRoleUser(id:ID!):SuccessResponse!
-    addFriend(id:ID!):SuccessResponse!
+    addFriend(email:String!):SuccessResponse!
     unFriend(id:ID!):SuccessResponse!
     ChangePassword(input : changePasswordInput!):SuccessResponse!
     delete_user(id:ID!):SuccessResponse!
     forgot_password(input : ForgotPassword!):SuccessResponse!
+    block_user(id:ID!):SuccessResponse!
+    unblock_user(id:ID!):SuccessResponse!
 }
-
 
 extend type Subscription {
     onlineTracker(userId: Int!): UserOnline!
+    friendRequestReceived(userId: Int!): FriendRequest
 }
 
-
+type FriendRequest {
+    senderId: Int!
+    message: String
+}
+type UserOnline {
+    id: Int
+    body: String
+}
 type User {
     id: Int!
     email: String!
@@ -33,6 +44,21 @@ type User {
     role: Int!
     createdAt: Date
     updatedAt: Date
+}
+type list_all_friend {
+    friend : [list_Friend]
+    block  : [list_Friend]
+    follower : [list_Friend]
+}
+type list_Friend {
+    id: Int!
+    email: String!
+    firstName: String!
+    lastName: String!
+    avatarUrl: String
+    status: Boolean
+    location: String
+    story: String
 }
 input UpdateUserInput{
     id : Int!
@@ -70,7 +96,3 @@ input ForgotPassword {
     gmail : String!
 }
 
-type UserOnline {
-    id: Int
-    body: String
-}

@@ -84,4 +84,5 @@ export default class PubSubService {
         }
         this.publishToUser(userIds, IUserEvent.Chat, chatMessage);
     }
+
 }

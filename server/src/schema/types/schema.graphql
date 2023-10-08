@@ -6,13 +6,20 @@ schema {
     subscription: Subscription
 }
 
+type FriendRequest {
+    message: String
+    senderId: Int!
+}
+
 type Mutation {
     ChangePassword(input: changePasswordInput!): SuccessResponse!
-    addFriend(id: ID!): SuccessResponse!
+    addFriend(email: String!): SuccessResponse!
+    block_user(id: ID!): SuccessResponse!
     delete_user(id: ID!): SuccessResponse!
     forgot_password(input: ForgotPassword!): SuccessResponse!
     register(input: CreateUserInput!): User!
     unFriend(id: ID!): SuccessResponse!
+    unblock_user(id: ID!): SuccessResponse!
     upRoleUser(id: ID!): SuccessResponse!
     updateUser(input: UpdateUserInput!): SuccessResponse!
 }
@@ -23,12 +30,15 @@ type PageInfo {
 }
 
 type Query {
+    listFriend: list_all_friend
     login(input: UserLoginInput!): UserLoginResponse!
+    me: User!
     user(id: ID!): User!
     users: [User]
 }
 
 type Subscription {
+    friendRequestReceived(userId: Int!): FriendRequest
     onlineTracker(userId: Int!): UserOnline!
 }
 
@@ -54,6 +64,23 @@ type UserLoginResponse {
 type UserOnline {
     body: String
     id: Int
+}
+
+type list_Friend {
+    avatarUrl: String
+    email: String!
+    firstName: String!
+    id: Int!
+    lastName: String!
+    location: String
+    status: Boolean
+    story: String
+}
+
+type list_all_friend {
+    block: [list_Friend]
+    follower: [list_Friend]
+    friend: [list_Friend]
 }
 
 enum SuccessResponse {

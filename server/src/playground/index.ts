@@ -42,8 +42,13 @@ const forgot_password = importGraphqlString(
 const upRoleUser = importGraphqlString('./mutations/upRole/upRoleUser.graphql');
 const user = importGraphqlString('./queries/me/user.graphql');
 const users = importGraphqlString('./queries/me/users.graphql');
-
-// const me = importGraphqlString('./queries/user/me.graphql');
+const listFriend = importGraphqlString('./queries/listFriend/listFriend.graphql');
+const me = importGraphqlString('./queries/me/me.graphql');
+const delete_user = importGraphqlString('./mutations/delete/delete.graphql');
+const addFriend = importGraphqlString('./mutations/addFriend/addFriend.graphql');
+const unFriend = importGraphqlString('./mutations/unFriend/unFriend.graphql');
+const block_user = importGraphqlString('./mutations/block_user/block_user.graphql');
+const unblock_user = importGraphqlString('./mutations/unblock_user/unblock_user.graphql');
 
 export const queryExample = async (
     path: string = defaultPath
@@ -62,7 +67,6 @@ export const queryExample = async (
             name: 'Đăng ký',
             query: register,
             variables: prettifyJsonString(variables.register),
-            headers: userAuth,
         },
         {
             endpoint: path,
@@ -83,7 +87,6 @@ export const queryExample = async (
             name: 'Quên mật khẩu',
             query: forgot_password,
             variables: prettifyJsonString(variables.forgot_password),
-            headers: userAuth,
         },
         {
             endpoint: path,
@@ -104,6 +107,55 @@ export const queryExample = async (
             name: 'Change Role User',
             query: upRoleUser,
             variables: prettifyJsonString(variables.upRoleUser),
+            headers: userAuth,
+        },
+        {
+            endpoint: path,
+            name: 'profile',
+            query: me,
+            variables: prettifyJsonString(variables.me),
+            headers: userAuth,
+        },
+        {
+            endpoint: path,
+            name: 'listFriend',
+            query: listFriend,
+            variables: prettifyJsonString(variables.listFriend),
+            headers: userAuth,
+        },
+        {
+            endpoint: path,
+            name: 'delete user for admin',
+            query: delete_user,
+            variables: prettifyJsonString(variables.delete_user),
+            headers: userAuth,
+        },
+        {
+            endpoint: path,
+            name: 'ket ban ',
+            query: addFriend,
+            variables: prettifyJsonString(variables.addFriend),
+            headers: userAuth,
+        },
+        {
+            endpoint: path,
+            name: 'huy ket ban ',
+            query: unFriend,
+            variables: prettifyJsonString(variables.unFriend),
+            headers: userAuth,
+        },
+        {
+            endpoint: path,
+            name: 'block',
+            query: block_user,
+            variables: prettifyJsonString(variables.block_user),
+            headers: userAuth,
+        },
+        {
+            endpoint: path,
+            name: 'unblock',
+            query: unblock_user,
+            variables: prettifyJsonString(variables.unblock_user),
             headers: userAuth,
         },
     ];

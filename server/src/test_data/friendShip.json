@@ -1,0 +1,5 @@
+[
+  {"Id": 1,"RequesterId" : 1, "AddresseeId": 3,"CreatedDateTime":"2023-08-28 09:09:59", "StatusCode":"B","SpecifierId":1},
+  {"Id": 2,"RequesterId" : 1 ,"AddresseeId": 5,"CreatedDateTime": "2023-08-25 09:09:59", "StatusCode":"A","SpecifierId":1},
+  {"Id": 3,"RequesterId" : 1 ,"AddresseeId": 7,"CreatedDateTime": "2023-08-26 10:09:59" , "StatusCode":"A","SpecifierId":7}
+]

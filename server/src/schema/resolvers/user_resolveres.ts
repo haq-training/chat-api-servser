@@ -1,15 +1,22 @@
-// eslint-disable-next-line import/extensions,@typescript-eslint/ban-ts-comment
-// @ts-ignore
-// eslint-disable-next-line import/extensions
+/* eslint-disable linebreak-style */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable linebreak-style */
+
 import bcrypt from 'bcrypt';
 import { Transaction } from 'sequelize';
-import { IResolvers } from '../../__generated__/graphql';
-import { MySQLError, UserNotFoundError } from '../../lib/classes/graphqlErrors';
-import { generateJWT, USER_JWT } from '../../lib/ultis/jwt';
+import { IResolvers, ISuccessResponse } from '../../__generated__/graphql';
+import {
+    MySQLError,
+    UserNotFoundError,
+    AuthenticationError,
+    TaskNotAllowUpdateError,
+    UserAlreadyExistError,
+} from '../../lib/classes/graphqlErrors';
+import { generateJWT } from '../../lib/ultis/jwt';
 import { db, sequelize } from '../../db_loaders/mysql';
 import { storageConfig } from '../../config/appConfig';
 import { minIOServices } from '../../lib/classes';
-import { ChatContext } from '../../server';
+// import { ChatContext } from '../../server';
 import { usersCreationAttributes } from '../../db_models/users';
 import { DefaultHashValue } from '../../lib/enum';
 import { checkAuthentication } from '../../lib/ultis/permision';
@@ -17,7 +24,20 @@ import { iRoleToNumber } from '../../lib/enum_resolvers';
 
 const userResolver: IResolvers = {
     Query: {
-        login: async (parent, { input }) => {
+        // eslint-disable-next-line no-empty-pattern
+        users: async (_parent, {}, context) => {
+            checkAuthentication(context);
+            return await db.users.findAll().catch((error) => {
+                throw new MySQLError(`Error: ${error.message}`);
+            });
+        },
+        user: async (_parent, { id }, context) => {
+            checkAuthentication(context);
+            return await db.users.findByPk(id, {
+                rejectOnEmpty: new UserNotFoundError(`User ID ${id} not found`),
+            });
+        },
+        login: async (_parent, { input }) => {
             const { account, password } = input;
             const user = await db.users.findOne({
                 where: {
@@ -31,29 +51,15 @@ const userResolver: IResolvers = {
             if (!checkPassword) {
                 throw new UserNotFoundError('Sai mật khẩu!!!');
             }
-
-            const userInfo: USER_JWT = {
-                id: user.id,
-                email: user.email,
-                avatarUrl: user.avatarUrl,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                status: user.status,
-                location: user.location,
-                story: user.story,
-                role: user.role,
-            };
-
-            const token = generateJWT(userInfo);
+            const token = generateJWT(user.email, user.id, user.role);
             return {
-                user,
                 token,
+                user,
             };
         },
     },
     Mutation: {
-        register: async (_parent, { input }, context: ChatContext) => {
-            checkAuthentication(context);
+        register: async (_parent, { input }) => {
             const {
                 email,
                 password,
@@ -64,7 +70,9 @@ const userResolver: IResolvers = {
                 story,
                 avatarUrl,
             } = input;
-
+            if (!email || !password) {
+                throw new Error('Email và mật khẩu không được để trống.');
+            }
             const createdUser = await db.users.findOne({
                 where: {
                     email,
@@ -72,7 +80,7 @@ const userResolver: IResolvers = {
                 rejectOnEmpty: false,
             });
             if (createdUser) {
-                throw new Error();
+                throw new UserAlreadyExistError();
             }
 
             const salt = bcrypt.genSaltSync(DefaultHashValue.saltRounds);
@@ -86,6 +94,7 @@ const userResolver: IResolvers = {
                 role: iRoleToNumber(role),
                 location: location ?? undefined,
                 story: story ?? undefined,
+                changePassword: 0,
             };
 
             return await sequelize.transaction(async (t: Transaction) => {
@@ -116,7 +125,125 @@ const userResolver: IResolvers = {
                 }
             });
         },
+        updateUser: async (_parent, { input }, context) => {
+            const { user } = context;
+            checkAuthentication(context);
+            const { id, firstName, lastName, avatar, location, story } = input;
+            if (user.id !== id) throw new AuthenticationError(context.error);
+
+            const CheckUserUpdate = await db.users.findByPk(id, {
+                rejectOnEmpty: new UserNotFoundError(),
+            });
+            CheckUserUpdate.firstName = firstName ?? CheckUserUpdate.firstName;
+            CheckUserUpdate.lastName = lastName ?? CheckUserUpdate.lastName;
+            CheckUserUpdate.location = location ?? CheckUserUpdate.location;
+            CheckUserUpdate.story = story ?? CheckUserUpdate.story;
+            const uploadAvatarProcess: any[] = [];
+            if (avatar) {
+                const { createReadStream, filename, mimetype } =
+                    await avatar.file;
+                if (CheckUserUpdate.avatarUrl) {
+                    const deletedOldAvatar = minIOServices.deleteObjects(
+                        [CheckUserUpdate.avatarUrl],
+                        storageConfig.minIO.devApp
+                    );
+                    uploadAvatarProcess.push(deletedOldAvatar);
+                }
+                const fileStream = createReadStream();
+                const filePath = `avatar/users/${user.id}/${filename}`;
+                const uploadNewAvatar = minIOServices.upload(
+                    storageConfig.minIO.devApp,
+                    filePath,
+                    fileStream,
+                    mimetype
+                );
+                CheckUserUpdate.avatarUrl = filePath;
+                uploadAvatarProcess.push(uploadNewAvatar);
+            }
+
+            await sequelize.transaction(async (t: Transaction) => {
+                try {
+                    await CheckUserUpdate.save({ transaction: t });
+                    if (uploadAvatarProcess.length > 0) {
+                        await Promise.all(uploadAvatarProcess);
+                    }
+                } catch (error) {
+                    await t.rollback();
+                    throw new MySQLError('Update User Fail');
+                }
+            });
+
+            return ISuccessResponse.Success;
+        },
+        upRoleUser: async (_parent, { id }, context) => {
+            const { user } = context;
+            checkAuthentication(context);
+            if (user.role !== false)
+                throw new UserNotFoundError(
+                    'Bạn không có quyền thực hiện chức năng này'
+                );
+            const CheckUserUpdate = await db.users.findByPk(id, {
+                rejectOnEmpty: new UserNotFoundError(),
+            });
+            CheckUserUpdate.role = 0;
+            await sequelize.transaction(async (t: Transaction) => {
+                try {
+                    await CheckUserUpdate.save({ transaction: t });
+                } catch (error) {
+                    await t.rollback();
+                    throw new MySQLError('Update User Fail');
+                }
+            });
+            return ISuccessResponse.Success;
+        },
+        delete_user: async (_parent, { id }, context) => {
+            checkAuthentication(context);
+            const { user } = context;
+            if (user.role !== false) throw new UserNotFoundError();
+            const userDelete = await db.users.findByPk(id, {
+                rejectOnEmpty: new UserNotFoundError(),
+            });
+            await userDelete.save();
+            return ISuccessResponse.Success;
+        },
+        ChangePassword: async (_parent, { input }, context) => {
+            checkAuthentication(context);
+            const { user } = context;
+            const { id, new_passWord, old_passWord } = input;
+            if (user.id.toString() !== id)
+                throw new UserNotFoundError(
+                    'Bạn không có quyền thực hiện chức năng này'
+                );
+            const User_changPass = await db.users.findByPk(id, {
+                rejectOnEmpty: new UserNotFoundError(),
+            });
+            const checkPassword = bcrypt.compareSync(
+                old_passWord,
+                User_changPass.password
+            );
+            if (!checkPassword) {
+                throw new TaskNotAllowUpdateError('Password không đúng!');
+            }
+
+            const salt = bcrypt.genSaltSync(DefaultHashValue.saltRounds);
+            User_changPass.password = bcrypt.hashSync(new_passWord, salt);
+            await User_changPass.save();
+
+            return ISuccessResponse.Success;
+        },
+        forgot_password: async (_parent, { input }) => {
+            const { gmail } = input;
+            const user_forgot = await db.users.findOne({
+                where: {
+                    email: gmail,
+                },
+            });
+            if (!user_forgot) throw new UserNotFoundError('Invalid User');
+            user_forgot.changePassword = 1;
+            await user_forgot.save();
+
+            return ISuccessResponse.Success;
+        },
     },
 };
-
 export default userResolver;

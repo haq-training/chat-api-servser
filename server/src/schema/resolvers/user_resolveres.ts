@@ -3,13 +3,14 @@
 /* eslint-disable linebreak-style */
 
 import bcrypt from 'bcrypt';
-import {Transaction} from 'sequelize';
+import { Transaction } from 'sequelize';
 import { IResolvers, ISuccessResponse } from '../../__generated__/graphql';
 import {
     MySQLError,
     UserNotFoundError,
     AuthenticationError,
-    TaskNotAllowUpdateError, UserAlreadyExistError,
+    TaskNotAllowUpdateError,
+    UserAlreadyExistError,
 } from '../../lib/classes/graphqlErrors';
 import { generateJWT } from '../../lib/ultis/jwt';
 import { db, sequelize } from '../../db_loaders/mysql';
@@ -79,7 +80,7 @@ const userResolver: IResolvers = {
                 rejectOnEmpty: false,
             });
             if (createdUser) {
-                throw new UserAlreadyExistError;
+                throw new UserAlreadyExistError();
             }
 
             const salt = bcrypt.genSaltSync(DefaultHashValue.saltRounds);
@@ -178,7 +179,9 @@ const userResolver: IResolvers = {
             const { user } = context;
             checkAuthentication(context);
             if (user.role !== false)
-                throw new TaskNotAllowUpdateError('ban khong phiai la admin');
+                throw new UserNotFoundError(
+                    'Bạn không có quyền thực hiện chức năng này'
+                );
             const CheckUserUpdate = await db.users.findByPk(id, {
                 rejectOnEmpty: new UserNotFoundError(),
             });
@@ -196,23 +199,21 @@ const userResolver: IResolvers = {
         delete_user: async (_parent, { id }, context) => {
             checkAuthentication(context);
             const { user } = context;
-            if (user.role !== false)
-                throw new TaskNotAllowUpdateError;
+            if (user.role !== false) throw new UserNotFoundError();
             const userDelete = await db.users.findByPk(id, {
                 rejectOnEmpty: new UserNotFoundError(),
             });
             await userDelete.save();
             return ISuccessResponse.Success;
         },
-        ChangePassword : async (_parent , {input},context)=>{
+        ChangePassword: async (_parent, { input }, context) => {
             checkAuthentication(context);
-            const {user} = context;
-            const {
-                id ,
-                new_passWord,
-                old_passWord
-            } = input;
-            if(user.id.toString() !== id) throw new TaskNotAllowUpdateError('ban khong co quyen doi mat khau');
+            const { user } = context;
+            const { id, new_passWord, old_passWord } = input;
+            if (user.id.toString() !== id)
+                throw new UserNotFoundError(
+                    'Bạn không có quyền thực hiện chức năng này'
+                );
             const User_changPass = await db.users.findByPk(id, {
                 rejectOnEmpty: new UserNotFoundError(),
             });
@@ -221,7 +222,7 @@ const userResolver: IResolvers = {
                 User_changPass.password
             );
             if (!checkPassword) {
-                throw new TaskNotAllowUpdateError('password ban ban nhap chua dung');
+                throw new TaskNotAllowUpdateError('Password không đúng!');
             }
 
             const salt = bcrypt.genSaltSync(DefaultHashValue.saltRounds);
@@ -230,21 +231,18 @@ const userResolver: IResolvers = {
 
             return ISuccessResponse.Success;
         },
-        forgot_password : async (_parent,{input})=>{
-            const {
-                gmail
-            } = input;
+        forgot_password: async (_parent, { input }) => {
+            const { gmail } = input;
             const user_forgot = await db.users.findOne({
                 where: {
-                    email: gmail
-                }
+                    email: gmail,
+                },
             });
-            if(!user_forgot) throw new TaskNotAllowUpdateError('ban khong co quyen doi mat khau');
+            if (!user_forgot) throw new UserNotFoundError('Invalid User');
             user_forgot.changePassword = 1;
             await user_forgot.save();
 
             return ISuccessResponse.Success;
-
         },
     },
 };

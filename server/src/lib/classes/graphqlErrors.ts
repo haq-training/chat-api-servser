@@ -7,7 +7,7 @@ export enum Chat_ERROR_CODE {
     UserAlreadyExist = 'UserAlreadyExist',
     InValidRole = 'InValidRole',
     MySQL = 'MySQL',
-    TaskNotAllowUpdate ='TaskNotAllowUpdate'
+    TaskNotAllowUpdate ='TaskNotAllowUpdate',
     InvalidPaginationArgument = 'InvalidPaginationArgument',
 }
 

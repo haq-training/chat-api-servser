@@ -8,7 +8,6 @@ import {
     MySQLError,
     UserNotFoundError,
     AuthenticationError,
-    TaskNotAllowUpdateError,
     UserAlreadyExistError,
 } from '../../lib/classes/graphqlErrors';
 import { generateJWT } from '../../lib/ultis/jwt';
@@ -236,7 +235,7 @@ const userResolver: IResolvers = {
                 User_changPass.password
             );
             if (!checkPassword) {
-                throw new TaskNotAllowUpdateError('Password không đúng!');
+                throw new UserNotFoundError('Password không đúng!');
             }
 
             const salt = bcrypt.genSaltSync(DefaultHashValue.saltRounds);
@@ -256,7 +255,9 @@ const userResolver: IResolvers = {
             user_forgot.changePassword = 1;
             await user_forgot.save();
             return ISuccessResponse.Success;
+        },
     },
+
     Subscription: {
         onlineTracker: {
             subscribe: (parent, { userId }) =>

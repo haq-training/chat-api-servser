@@ -7,7 +7,14 @@ schema {
 }
 
 type Mutation {
+    ChangePassword(input: changePasswordInput!): SuccessResponse!
+    addFriend(id: ID!): SuccessResponse!
+    delete_user(id: ID!): SuccessResponse!
+    forgot_password(input: ForgotPassword!): SuccessResponse!
     register(input: CreateUserInput!): User!
+    unFriend(id: ID!): SuccessResponse!
+    upRoleUser(id: ID!): SuccessResponse!
+    updateUser(input: UpdateUserInput!): SuccessResponse!
 }
 
 type PageInfo {
@@ -17,7 +24,8 @@ type PageInfo {
 
 type Query {
     login(input: UserLoginInput!): UserLoginResponse!
-    me: User!
+    user(id: ID!): User!
+    users: [User]
 }
 
 type Subscription {
@@ -71,6 +79,10 @@ input CreateUserInput {
     story: String
 }
 
+input ForgotPassword {
+    gmail: String!
+}
+
 input PaginationInput {
     after: Cursor
     before: Cursor
@@ -78,7 +90,22 @@ input PaginationInput {
     last: Int
 }
 
+input UpdateUserInput {
+    avatar: Upload
+    firstName: String
+    id: Int!
+    lastName: String
+    location: String
+    story: String
+}
+
 input UserLoginInput {
     account: String!
     password: String!
+}
+
+input changePasswordInput {
+    id: ID!
+    new_passWord: String!
+    old_passWord: String!
 }

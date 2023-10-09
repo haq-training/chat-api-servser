@@ -32,6 +32,17 @@ const login = importGraphqlString('./queries/authentication/login.graphql');
 
 const register = importGraphqlString('./mutations/register/register.graphql');
 
+const updateUser = importGraphqlString('./mutations/user/update.graphql');
+const ChangePassword = importGraphqlString(
+    './mutations/changePassword/changePassword.graphql'
+);
+const forgot_password = importGraphqlString(
+    './mutations/forgot_password/forgot_password.graphql'
+);
+const upRoleUser = importGraphqlString('./mutations/upRole/upRoleUser.graphql');
+const user = importGraphqlString('./queries/me/user.graphql');
+const users = importGraphqlString('./queries/me/users.graphql');
+
 // const me = importGraphqlString('./queries/user/me.graphql');
 
 export const queryExample = async (
@@ -51,6 +62,48 @@ export const queryExample = async (
             name: 'Đăng ký',
             query: register,
             variables: prettifyJsonString(variables.register),
+            headers: userAuth,
+        },
+        {
+            endpoint: path,
+            name: 'Sửa thông tin người dùng ',
+            query: updateUser,
+            variables: prettifyJsonString(variables.updateUser),
+            headers: userAuth,
+        },
+        {
+            endpoint: path,
+            name: 'Đổi mật khẩu ',
+            query: ChangePassword,
+            variables: prettifyJsonString(variables.ChangePassword),
+            headers: userAuth,
+        },
+        {
+            endpoint: path,
+            name: 'Quên mật khẩu',
+            query: forgot_password,
+            variables: prettifyJsonString(variables.forgot_password),
+            headers: userAuth,
+        },
+        {
+            endpoint: path,
+            name: 'Get User',
+            query: user,
+            variables: prettifyJsonString(variables.user),
+            headers: userAuth,
+        },
+        {
+            endpoint: path,
+            name: 'Get all User',
+            query: users,
+            variables: prettifyJsonString(variables.users),
+            headers: userAuth,
+        },
+        {
+            endpoint: path,
+            name: 'Change Role User',
+            query: upRoleUser,
+            variables: prettifyJsonString(variables.upRoleUser),
             headers: userAuth,
         },
     ];

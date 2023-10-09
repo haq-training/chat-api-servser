@@ -7,6 +7,7 @@ export enum Chat_ERROR_CODE {
     UserAlreadyExist = 'UserAlreadyExist',
     InValidRole = 'InValidRole',
     MySQL = 'MySQL',
+    TaskNotAllowUpdate ='TaskNotAllowUpdate',
     InvalidPaginationArgument = 'InvalidPaginationArgument',
 }
 
@@ -27,6 +28,17 @@ export class UserNotFoundError extends GraphQLError {
                 code: Chat_ERROR_CODE.UserNotFound,
             },
         });
+    }
+}
+export class TaskNotAllowUpdateError extends GraphQLError {
+    constructor(message: string | null = null) {
+        super(
+            message || 'TaskNotAllowUpdateError',{
+                extensions: {
+                    code: Chat_ERROR_CODE.TaskNotAllowUpdate,
+                },
+            }
+        );
     }
 }
 export class UserAlreadyExistError extends GraphQLError {

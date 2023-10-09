@@ -42,8 +42,10 @@ const forgot_password = importGraphqlString(
 const upRoleUser = importGraphqlString('./mutations/upRole/upRoleUser.graphql');
 const user = importGraphqlString('./queries/me/user.graphql');
 const users = importGraphqlString('./queries/me/users.graphql');
+const listFriend = importGraphqlString('./queries/listFriend/listFriend.graphql');
+const me = importGraphqlString('./queries/me/me.graphql');
+const delete_user = importGraphqlString('./mutations/delete/delete.graphql');
 
-// const me = importGraphqlString('./queries/user/me.graphql');
 
 export const queryExample = async (
     path: string = defaultPath
@@ -62,7 +64,6 @@ export const queryExample = async (
             name: 'Đăng ký',
             query: register,
             variables: prettifyJsonString(variables.register),
-            headers: userAuth,
         },
         {
             endpoint: path,
@@ -83,7 +84,6 @@ export const queryExample = async (
             name: 'Quên mật khẩu',
             query: forgot_password,
             variables: prettifyJsonString(variables.forgot_password),
-            headers: userAuth,
         },
         {
             endpoint: path,
@@ -104,6 +104,27 @@ export const queryExample = async (
             name: 'Change Role User',
             query: upRoleUser,
             variables: prettifyJsonString(variables.upRoleUser),
+            headers: userAuth,
+        },
+        {
+            endpoint: path,
+            name: 'profile',
+            query: me,
+            variables: prettifyJsonString(variables.me),
+            headers: userAuth,
+        },
+        {
+            endpoint: path,
+            name: 'listFriend',
+            query: listFriend,
+            variables: prettifyJsonString(variables.listFriend),
+            headers: userAuth,
+        },
+        {
+            endpoint: path,
+            name: 'delete user for admin',
+            query: delete_user,
+            variables: prettifyJsonString(variables.delete_user),
             headers: userAuth,
         },
     ];

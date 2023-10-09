@@ -1,5 +1,0 @@
-[{"status":"R" ,"name" :"Requested" },
-  {"status":"A" ,"name" :"Accepted" },
-  {"status":"D" ,"name" : "Declined"},
-  {"status": "B","name" : "Blocked"}
-]

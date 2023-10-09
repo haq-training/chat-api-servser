@@ -22,7 +22,9 @@ type PageInfo {
 }
 
 type Query {
+    listFriend: [list_Friend]
     login(input: UserLoginInput!): UserLoginResponse!
+    me: User!
     user(id: ID!): User!
     users: [User]
 }
@@ -44,6 +46,17 @@ type User {
 type UserLoginResponse {
     token: String!
     user: User!
+}
+
+type list_Friend {
+    avatarUrl: String
+    email: String!
+    firstName: String!
+    id: Int!
+    lastName: String!
+    location: String
+    status: Boolean
+    story: String
 }
 
 enum SuccessResponse {

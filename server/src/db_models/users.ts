@@ -1,225 +1,251 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model, Optional } from 'sequelize';
+import type { FriendshipStatus, FriendshipStatusId } from './FriendshipStatus';
 import type { chat_members, chat_membersId } from './chat_members';
 import type { file, fileId } from './file';
 
 export interface usersAttributes {
-    id: number;
-    email: string;
-    password: string;
-    avatarUrl?: string;
-    firstName?: string;
-    lastName?: string;
-    status?: boolean;
-    location?: string;
-    story?: string;
-    role: number;
-    changePassword : number;
-    createdAt?: Date;
-    updatedAt?: Date;
+  id: number;
+  email: string;
+  password: string;
+  changePassword: number;
+  avatarUrl?: string;
+  firstName?: string;
+  lastName?: string;
+  status?: number;
+  location?: string;
+  story?: string;
+  role: number;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export type usersPk = 'id';
 export type usersId = users[usersPk];
-export type usersOptionalAttributes =
-    | 'id'
-    | 'avatarUrl'
-    | 'firstName'
-    | 'lastName'
-    | 'location'
-    | 'story'
-    | 'changePassword'
-    | 'createdAt'
-    | 'updatedAt';
-export type usersCreationAttributes = Optional<
-    usersAttributes,
-    usersOptionalAttributes
->;
+export type usersOptionalAttributes = 'id' | 'avatarUrl' | 'firstName' | 'lastName' | 'status' | 'location' | 'story' | 'createdAt' | 'updatedAt';
+export type usersCreationAttributes = Optional<usersAttributes, usersOptionalAttributes>;
 
-export class users
-    extends Model<usersAttributes, usersCreationAttributes>
-    implements usersAttributes
-{
-    id!: number;
+export class users extends Model<usersAttributes, usersCreationAttributes> implements usersAttributes {
+  id!: number;
 
-    email!: string;
+  email!: string;
 
-    password!: string;
+  password!: string;
 
-    avatarUrl?: string;
+  changePassword!: number;
 
-    firstName?: string;
+  avatarUrl?: string;
 
-    lastName?: string;
+  firstName?: string;
 
-    status?: boolean;
+  lastName?: string;
 
-    location?: string;
+  status?: number;
 
-    story?: string;
+  location?: string;
 
-    role!: number;
+  story?: string;
 
-    changePassword!: number;
+  role!: number;
 
-    createdAt?: Date;
+  createdAt?: Date;
 
-    updatedAt?: Date;
+  updatedAt?: Date;
 
-    // users hasMany chat_members via userId
-    chat_members!: chat_members[];
+  // users hasMany FriendshipStatus via AddresseeId
+  FriendshipStatuses!: FriendshipStatus[];
 
-    getChat_members!: Sequelize.HasManyGetAssociationsMixin<chat_members>;
+  getFriendshipStatuses!: Sequelize.HasManyGetAssociationsMixin<FriendshipStatus>;
 
-    setChat_members!: Sequelize.HasManySetAssociationsMixin<
-        chat_members,
-        chat_membersId
-    >;
+  setFriendshipStatuses!: Sequelize.HasManySetAssociationsMixin<FriendshipStatus, FriendshipStatusId>;
 
-    addChat_member!: Sequelize.HasManyAddAssociationMixin<
-        chat_members,
-        chat_membersId
-    >;
+  addFriendshipStatus!: Sequelize.HasManyAddAssociationMixin<FriendshipStatus, FriendshipStatusId>;
 
-    addChat_members!: Sequelize.HasManyAddAssociationsMixin<
-        chat_members,
-        chat_membersId
-    >;
+  addFriendshipStatuses!: Sequelize.HasManyAddAssociationsMixin<FriendshipStatus, FriendshipStatusId>;
 
-    createChat_member!: Sequelize.HasManyCreateAssociationMixin<chat_members>;
+  createFriendshipStatus!: Sequelize.HasManyCreateAssociationMixin<FriendshipStatus>;
 
-    removeChat_member!: Sequelize.HasManyRemoveAssociationMixin<
-        chat_members,
-        chat_membersId
-    >;
+  removeFriendshipStatus!: Sequelize.HasManyRemoveAssociationMixin<FriendshipStatus, FriendshipStatusId>;
 
-    removeChat_members!: Sequelize.HasManyRemoveAssociationsMixin<
-        chat_members,
-        chat_membersId
-    >;
+  removeFriendshipStatuses!: Sequelize.HasManyRemoveAssociationsMixin<FriendshipStatus, FriendshipStatusId>;
 
-    hasChat_member!: Sequelize.HasManyHasAssociationMixin<
-        chat_members,
-        chat_membersId
-    >;
+  hasFriendshipStatus!: Sequelize.HasManyHasAssociationMixin<FriendshipStatus, FriendshipStatusId>;
 
-    hasChat_members!: Sequelize.HasManyHasAssociationsMixin<
-        chat_members,
-        chat_membersId
-    >;
+  hasFriendshipStatuses!: Sequelize.HasManyHasAssociationsMixin<FriendshipStatus, FriendshipStatusId>;
 
-    countChat_members!: Sequelize.HasManyCountAssociationsMixin;
+  countFriendshipStatuses!: Sequelize.HasManyCountAssociationsMixin;
 
-    // users hasMany contacts via userId
-    countFriend_contacts!: Sequelize.HasManyCountAssociationsMixin;
+  // users hasMany FriendshipStatus via RequesterId
+  Requester_FriendshipStatuses!: FriendshipStatus[];
 
-    // users hasMany file via uploadBy
-    files!: file[];
+  getRequester_FriendshipStatuses!: Sequelize.HasManyGetAssociationsMixin<FriendshipStatus>;
 
-    getFiles!: Sequelize.HasManyGetAssociationsMixin<file>;
+  setRequester_FriendshipStatuses!: Sequelize.HasManySetAssociationsMixin<FriendshipStatus, FriendshipStatusId>;
 
-    setFiles!: Sequelize.HasManySetAssociationsMixin<file, fileId>;
+  addRequester_FriendshipStatus!: Sequelize.HasManyAddAssociationMixin<FriendshipStatus, FriendshipStatusId>;
 
-    addFile!: Sequelize.HasManyAddAssociationMixin<file, fileId>;
+  addRequester_FriendshipStatuses!: Sequelize.HasManyAddAssociationsMixin<FriendshipStatus, FriendshipStatusId>;
 
-    addFiles!: Sequelize.HasManyAddAssociationsMixin<file, fileId>;
+  createRequester_FriendshipStatus!: Sequelize.HasManyCreateAssociationMixin<FriendshipStatus>;
 
-    createFile!: Sequelize.HasManyCreateAssociationMixin<file>;
+  removeRequester_FriendshipStatus!: Sequelize.HasManyRemoveAssociationMixin<FriendshipStatus, FriendshipStatusId>;
 
-    removeFile!: Sequelize.HasManyRemoveAssociationMixin<file, fileId>;
+  removeRequester_FriendshipStatuses!: Sequelize.HasManyRemoveAssociationsMixin<FriendshipStatus, FriendshipStatusId>;
 
-    removeFiles!: Sequelize.HasManyRemoveAssociationsMixin<file, fileId>;
+  hasRequester_FriendshipStatus!: Sequelize.HasManyHasAssociationMixin<FriendshipStatus, FriendshipStatusId>;
 
-    hasFile!: Sequelize.HasManyHasAssociationMixin<file, fileId>;
+  hasRequester_FriendshipStatuses!: Sequelize.HasManyHasAssociationsMixin<FriendshipStatus, FriendshipStatusId>;
 
-    hasFiles!: Sequelize.HasManyHasAssociationsMixin<file, fileId>;
+  countRequester_FriendshipStatuses!: Sequelize.HasManyCountAssociationsMixin;
 
-    countFiles!: Sequelize.HasManyCountAssociationsMixin;
+  // users hasMany FriendshipStatus via SpecifierId
+  Specifier_FriendshipStatuses!: FriendshipStatus[];
 
-    static initModel(sequelize: Sequelize.Sequelize): typeof users {
-        return users.init(
-            {
-                id: {
-                    type: DataTypes.INTEGER,
-                    allowNull: false,
-                    primaryKey: true,
-                    autoIncrement: true,
-                },
-                email: {
-                    type: DataTypes.STRING(45),
-                    allowNull: false,
-                    unique: 'email_UNIQUE',
-                },
-                password: {
-                    type: DataTypes.STRING(200),
-                    allowNull: false,
-                },
-                changePassword : {
-                    type: DataTypes.INTEGER,
-                    allowNull: false,
-                },
-                avatarUrl: {
-                    type: DataTypes.STRING(200),
-                    allowNull: true,
-                },
-                firstName: {
-                    type: DataTypes.STRING(45),
-                    allowNull: true,
-                },
-                lastName: {
-                    type: DataTypes.STRING(45),
-                    allowNull: true,
-                },
-                status: {
-                    type: DataTypes.BOOLEAN,
-                    allowNull: true,
-                },
-                location: {
-                    type: DataTypes.STRING(45),
-                    allowNull: true,
-                },
-                story: {
-                    type: DataTypes.STRING(100),
-                    allowNull: true,
-                },
-                role: {
-                    type: DataTypes.BOOLEAN,
-                    allowNull: false,
-                },
-                createdAt: {
-                    type: DataTypes.DATE,
-                    allowNull: true,
-                },
-                updatedAt: {
-                    type: DataTypes.DATE,
-                    allowNull: true,
-                },
-            },
-            {
-                sequelize,
-                tableName: 'users',
-                timestamps: true,
-                indexes: [
-                    {
-                        name: 'PRIMARY',
-                        unique: true,
-                        using: 'BTREE',
-                        fields: [{ name: 'id' }],
-                    },
-                    {
-                        name: 'email_UNIQUE',
-                        unique: true,
-                        using: 'BTREE',
-                        fields: [{ name: 'email' }],
-                    },
-                    {
-                        name: 'id_UNIQUE',
-                        unique: true,
-                        using: 'BTREE',
-                        fields: [{ name: 'id' }],
-                    },
-                ],
-            }
-        );
+  getSpecifier_FriendshipStatuses!: Sequelize.HasManyGetAssociationsMixin<FriendshipStatus>;
+
+  setSpecifier_FriendshipStatuses!: Sequelize.HasManySetAssociationsMixin<FriendshipStatus, FriendshipStatusId>;
+
+  addSpecifier_FriendshipStatus!: Sequelize.HasManyAddAssociationMixin<FriendshipStatus, FriendshipStatusId>;
+
+  addSpecifier_FriendshipStatuses!: Sequelize.HasManyAddAssociationsMixin<FriendshipStatus, FriendshipStatusId>;
+
+  createSpecifier_FriendshipStatus!: Sequelize.HasManyCreateAssociationMixin<FriendshipStatus>;
+
+  removeSpecifier_FriendshipStatus!: Sequelize.HasManyRemoveAssociationMixin<FriendshipStatus, FriendshipStatusId>;
+
+  removeSpecifier_FriendshipStatuses!: Sequelize.HasManyRemoveAssociationsMixin<FriendshipStatus, FriendshipStatusId>;
+
+  hasSpecifier_FriendshipStatus!: Sequelize.HasManyHasAssociationMixin<FriendshipStatus, FriendshipStatusId>;
+
+  hasSpecifier_FriendshipStatuses!: Sequelize.HasManyHasAssociationsMixin<FriendshipStatus, FriendshipStatusId>;
+
+  countSpecifier_FriendshipStatuses!: Sequelize.HasManyCountAssociationsMixin;
+
+  // users hasMany chat_members via userId
+  chat_members!: chat_members[];
+
+  getChat_members!: Sequelize.HasManyGetAssociationsMixin<chat_members>;
+
+  setChat_members!: Sequelize.HasManySetAssociationsMixin<chat_members, chat_membersId>;
+
+  addChat_member!: Sequelize.HasManyAddAssociationMixin<chat_members, chat_membersId>;
+
+  addChat_members!: Sequelize.HasManyAddAssociationsMixin<chat_members, chat_membersId>;
+
+  createChat_member!: Sequelize.HasManyCreateAssociationMixin<chat_members>;
+
+  removeChat_member!: Sequelize.HasManyRemoveAssociationMixin<chat_members, chat_membersId>;
+
+  removeChat_members!: Sequelize.HasManyRemoveAssociationsMixin<chat_members, chat_membersId>;
+
+  hasChat_member!: Sequelize.HasManyHasAssociationMixin<chat_members, chat_membersId>;
+
+  hasChat_members!: Sequelize.HasManyHasAssociationsMixin<chat_members, chat_membersId>;
+
+  countChat_members!: Sequelize.HasManyCountAssociationsMixin;
+
+  // users hasMany file via uploadBy
+  files!: file[];
+
+  getFiles!: Sequelize.HasManyGetAssociationsMixin<file>;
+
+  setFiles!: Sequelize.HasManySetAssociationsMixin<file, fileId>;
+
+  addFile!: Sequelize.HasManyAddAssociationMixin<file, fileId>;
+
+  addFiles!: Sequelize.HasManyAddAssociationsMixin<file, fileId>;
+
+  createFile!: Sequelize.HasManyCreateAssociationMixin<file>;
+
+  removeFile!: Sequelize.HasManyRemoveAssociationMixin<file, fileId>;
+
+  removeFiles!: Sequelize.HasManyRemoveAssociationsMixin<file, fileId>;
+
+  hasFile!: Sequelize.HasManyHasAssociationMixin<file, fileId>;
+
+  hasFiles!: Sequelize.HasManyHasAssociationsMixin<file, fileId>;
+
+  countFiles!: Sequelize.HasManyCountAssociationsMixin;
+
+  static initModel(sequelize: Sequelize.Sequelize): typeof users {
+    return users.init({
+    id: {
+      autoIncrement: true,
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true
+    },
+    email: {
+      type: DataTypes.STRING(45),
+      allowNull: false,
+      unique: 'email_UNIQUE'
+    },
+    password: {
+      type: DataTypes.STRING(200),
+      allowNull: false
+    },
+    changePassword: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    avatarUrl: {
+      type: DataTypes.STRING(200),
+      allowNull: true
+    },
+    firstName: {
+      type: DataTypes.STRING(45),
+      allowNull: true
+    },
+    lastName: {
+      type: DataTypes.STRING(45),
+      allowNull: true
+    },
+    status: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true
+    },
+    location: {
+      type: DataTypes.STRING(45),
+      allowNull: true
+    },
+    story: {
+      type: DataTypes.STRING(100),
+      allowNull: true
+    },
+    role: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false
     }
+  }, {
+    sequelize,
+    tableName: 'users',
+    timestamps: true,
+    indexes: [
+      {
+        name: 'PRIMARY',
+        unique: true,
+        using: 'BTREE',
+        fields: [
+          { name: 'id' },
+        ]
+      },
+      {
+        name: 'email_UNIQUE',
+        unique: true,
+        using: 'BTREE',
+        fields: [
+          { name: 'email' },
+        ]
+      },
+      {
+        name: 'id_UNIQUE',
+        unique: true,
+        using: 'BTREE',
+        fields: [
+          { name: 'id' },
+        ]
+      },
+    ]
+  });
+  }
 }

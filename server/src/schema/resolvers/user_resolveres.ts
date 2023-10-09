@@ -3,7 +3,7 @@
 /* eslint-disable linebreak-style */
 
 import bcrypt from 'bcrypt';
-import { Transaction } from 'sequelize';
+import { Transaction,Op } from 'sequelize';
 import { IResolvers, ISuccessResponse } from '../../__generated__/graphql';
 import {
     MySQLError,
@@ -18,11 +18,12 @@ import { storageConfig } from '../../config/appConfig';
 import { minIOServices } from '../../lib/classes';
 // import { ChatContext } from '../../server';
 import { usersCreationAttributes } from '../../db_models/users';
-import { DefaultHashValue } from '../../lib/enum';
+import {DefaultHashValue, StatusFriend} from '../../lib/enum';
 import { checkAuthentication } from '../../lib/ultis/permision';
 import { iRoleToNumber } from '../../lib/enum_resolvers';
 
 const userResolver: IResolvers = {
+
     Query: {
         // eslint-disable-next-line no-empty-pattern
         users: async (_parent, {}, context) => {
@@ -56,6 +57,72 @@ const userResolver: IResolvers = {
                 token,
                 user,
             };
+        },
+        // eslint-disable-next-line no-empty-pattern
+        listFriend :async (_parent,{},context)=>{
+            checkAuthentication(context);
+            const {user} = context;
+            const friendships = await db.Friendship.findAll({
+                where: {
+                    [Op.or]: [
+                        { RequesterId: user.id },
+                        { AddresseeId: user.id },
+                    ],
+                },
+                attributes: [
+                    [sequelize.literal('CASE WHEN `RequesterId` = :userId THEN `AddresseeId` ELSE `RequesterId` END'), 'friendId'],
+                ],
+                raw: true,
+                replacements: { userId: user.id },
+            });
+
+            const friendIds = friendships.map(element => (element as unknown as { friendId: number }).friendId);
+            const uniqueFriendIds = [...new Set(friendIds)];
+            interface User {
+                id: number;
+                email: string
+                firstName : string
+                lastName : string
+                avatarUrl : string
+                status : boolean
+                location: string
+                story: string
+            }
+            const userInfos: User[] = [];
+            async function fetchUserData(element : any) {
+                return {
+                    id: element.id,
+                    email: element.email,
+                    firstName : element.firstName,
+                    lastName : element.lastName,
+                    avatarUrl : element.avatarUrl,
+                    status : element.status,
+                    location: element.location,
+                    story: element.story
+                };
+            }
+            const promises = uniqueFriendIds.map(async (element) => {
+                const userInfo = await db.users.findByPk(element);
+                const userData = await fetchUserData(userInfo);
+                return userData;
+            });
+
+             await Promise.all(promises)
+                .then((userInfosData) => {
+                    userInfos.push(...userInfosData);
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+            return userInfos;
+        },
+        // eslint-disable-next-line no-empty-pattern
+        me: async (_parent,{},context) => {
+            checkAuthentication(context);
+            const {user} = context;
+            return await db.users.findByPk(user.id, {
+                rejectOnEmpty: new UserNotFoundError(`User ID ${user.id} not found`),
+            });
         },
     },
     Mutation: {
@@ -203,8 +270,42 @@ const userResolver: IResolvers = {
             const userDelete = await db.users.findByPk(id, {
                 rejectOnEmpty: new UserNotFoundError(),
             });
-            await userDelete.save();
-            return ISuccessResponse.Success;
+            if(!userDelete){
+                throw new UserNotFoundError;
+            }
+            return sequelize.transaction(async (t) => {
+                try{
+                    await db.Friendship.destroy({
+                        where: {
+                            [Op.or]: [
+                                { RequesterId: parseInt(id,10) },
+                                { AddresseeId: parseInt(id,10) },
+                            ],
+                        },
+                        transaction: t,
+                    });
+                    await db.FriendshipStatus.destroy({
+                        where: {
+                            [Op.or]: [
+                                { RequesterId: parseInt(id,10) },
+                                { AddresseeId: parseInt(id,10) },
+                            ],
+                        },
+                        transaction: t,
+                    });
+                    await db.users.destroy({
+                        where: { id },
+                        transaction: t,
+
+                    });
+                    return ISuccessResponse.Success;
+                } catch (error) {
+                    await t.rollback();
+                    throw new MySQLError(
+                        `Lỗi bất thường khi thao tác trong cơ sở dữ liệu: ${error}`
+                    );
+                }
+            });
         },
         ChangePassword: async (_parent, { input }, context) => {
             checkAuthentication(context);
@@ -237,6 +338,7 @@ const userResolver: IResolvers = {
                 where: {
                     email: gmail,
                 },
+                rejectOnEmpty: new UserNotFoundError(),
             });
             if (!user_forgot) throw new UserNotFoundError('Invalid User');
             user_forgot.changePassword = 1;
@@ -244,6 +346,46 @@ const userResolver: IResolvers = {
 
             return ISuccessResponse.Success;
         },
+        addFriend : async (_parent,{id},context)=>{
+    checkAuthentication(context);
+    const {user} = context;
+    const user_add =  await db.users.findByPk(id,{
+        rejectOnEmpty: new UserNotFoundError(),
+    });
+    if(user.id === parseInt(id,10)){
+        throw new Error('khong the tu gui ket ban cho chinh minh');
+    }
+    const check_user = await db.FriendshipStatus.findOne({
+        where: {
+            RequesterId: parseInt(id,10),
+            AddresseeId: user.id,
+            SpecifiedDateTime: sequelize.literal(
+                `(SELECT MAX(SpecifiedDateTime) FROM FriendshipStatus AS NestedFS
+    WHERE NestedFS.RequesterId = FriendshipStatus.RequesterId
+    AND NestedFS.AddresseeId = FriendshipStatus.AddresseeId)`
+            ),
+        },
+        rejectOnEmpty: false,
+    });
+    if(check_user){
+        if(check_user.StatusCode === StatusFriend.Requested){
+            throw new Error(`${user_add.firstName  }da gui loi moi ket ban cho ban`);
+        }
+        if(check_user.StatusCode === StatusFriend.Blocked){
+            throw new Error(`${user_add.firstName  }da block ban `);
+        }
+        if(check_user.StatusCode === StatusFriend.Accepted){
+            throw new Error(`${user_add.firstName  } da la ban be`);
+        }
+    }
+    await db.FriendshipStatus.create({
+        RequesterId: user.id,
+        AddresseeId : parseInt(id,10),
+        StatusCode : StatusFriend.Requested,
+        SpecifierId : user.id
+    });
+    return ISuccessResponse.Success;
+},
     },
 };
 export default userResolver;

@@ -1,0 +1,12 @@
+query Query {
+    listFriend{
+        id
+        email
+        firstName
+        lastName
+        status
+        story
+        location
+        avatarUrl
+    }
+}

@@ -35,9 +35,7 @@ export const variables = {
             id : 2
     },
     delete_user: {
-        input: {
-            id : 10,
-        },
+            id : 5,
     },
     ChangePassword: {
         input: {
@@ -55,6 +53,10 @@ export const variables = {
        id : 2
     },
     users: {
+    },
+    me: {
+    },
+    listFriend: {
     },
 
 

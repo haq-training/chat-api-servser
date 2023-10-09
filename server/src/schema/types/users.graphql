@@ -2,6 +2,8 @@ extend type Query {
     users: [User]
     user(id:ID!): User!
     login(input: UserLoginInput!): UserLoginResponse!
+    me:User!
+    listFriend : [list_Friend]
 }
 
 extend type Mutation {
@@ -27,6 +29,16 @@ type User {
     role: Int!
     createdAt: Date
     updatedAt: Date
+}
+type list_Friend {
+    id: Int!
+    email: String!
+    firstName: String!
+    lastName: String!
+    avatarUrl: String
+    status: Boolean
+    location: String
+    story: String
 }
 input UpdateUserInput{
     id : Int!

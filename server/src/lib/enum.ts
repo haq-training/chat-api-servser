@@ -11,3 +11,9 @@ export enum ChatRoomType {
     private = 0,
     group = 1,
 }
+export enum StatusFriend {
+    Requested = 'R',
+    Accepted = 'A',
+    Declined = 'D',
+     Blocked = 'B',
+}

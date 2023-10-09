@@ -118,6 +118,7 @@ export type IPaginationInput = {
 export type IQuery = {
     __typename?: 'Query';
     login: IUserLoginResponse;
+    me: IUser;
     user: IUser;
     users?: Maybe<Array<Maybe<IUser>>>;
 };
@@ -423,6 +424,7 @@ export type IQueryResolvers<
         ContextType,
         RequireFields<IQueryLoginArgs, 'input'>
     >;
+    me?: Resolver<IResolversTypes['User'], ParentType, ContextType>;
     user?: Resolver<
         IResolversTypes['User'],
         ParentType,

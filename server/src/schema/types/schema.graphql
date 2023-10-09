@@ -23,6 +23,7 @@ type PageInfo {
 
 type Query {
     login(input: UserLoginInput!): UserLoginResponse!
+    me: User!
     user(id: ID!): User!
     users: [User]
 }

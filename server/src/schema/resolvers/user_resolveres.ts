@@ -23,6 +23,7 @@ import { checkAuthentication } from '../../lib/ultis/permision';
 import { iRoleToNumber } from '../../lib/enum_resolvers';
 
 const userResolver: IResolvers = {
+
     Query: {
         // eslint-disable-next-line no-empty-pattern
         users: async (_parent, {}, context) => {
@@ -57,6 +58,15 @@ const userResolver: IResolvers = {
                 user,
             };
         },
+        // eslint-disable-next-line no-empty-pattern
+        me: async (_parent,{},context) => {
+            checkAuthentication(context);
+            const {user} = context;
+            return await db.users.findByPk(user.id, {
+                rejectOnEmpty: new UserNotFoundError(`User ID ${user.id} not found`),
+            });
+        }
+
     },
     Mutation: {
         register: async (_parent, { input }) => {

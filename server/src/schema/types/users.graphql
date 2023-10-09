@@ -2,6 +2,7 @@ extend type Query {
     users: [User]
     user(id:ID!): User!
     login(input: UserLoginInput!): UserLoginResponse!
+    me:User!
 }
 
 extend type Mutation {

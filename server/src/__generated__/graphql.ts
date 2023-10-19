@@ -4,6 +4,10 @@ import {
     GraphQLScalarTypeConfig,
 } from 'graphql';
 import { users } from '../db_models/init-models';
+import {
+    IChatMessageModel,
+    ChatMessageConnection,
+} from '../mongodb_models/chatMessage';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = {
@@ -43,6 +47,21 @@ export type Scalars = {
     Upload: { input: any; output: any };
 };
 
+export type IChatMessage = {
+    __typename?: 'ChatMessage';
+    content: Scalars['String']['output'];
+    id: Scalars['ID']['output'];
+    messageContentType?: Maybe<IMessageContentType>;
+    posted_at: Scalars['Date']['output'];
+    posted_by: IUser;
+    /**
+     * Return number of read by another user for message send by own.
+     * Return null if posted by another user.
+     */
+    read_count?: Maybe<Scalars['Int']['output']>;
+    room_id: Scalars['Int']['output'];
+};
+
 export type ICreateUserInput = {
     avatarUrl?: InputMaybe<Scalars['Upload']['input']>;
     email: Scalars['String']['input'];
@@ -57,6 +76,11 @@ export type ICreateUserInput = {
 export type IForgotPassword = {
     gmail: Scalars['String']['input'];
 };
+
+export enum IMessageContentType {
+    Image = 'image',
+    Text = 'text',
+}
 
 export type IMutation = {
     __typename?: 'Mutation';
@@ -126,6 +150,10 @@ export type IQueryLoginArgs = {
     input: IUserLoginInput;
 };
 
+export type IQueryUserArgs = {
+    id: Scalars['ID']['input'];
+};
+
 export type ISubscription = {
     __typename?: 'Subscription';
     onlineTracker: IUserOnline;
@@ -133,10 +161,6 @@ export type ISubscription = {
 
 export type ISubscriptionOnlineTrackerArgs = {
     userId: Scalars['Int']['input'];
-};
-
-export type IQueryUserArgs = {
-    id: Scalars['ID']['input'];
 };
 
 export enum ISuccessResponse {
@@ -298,6 +322,7 @@ export type DirectiveResolverFn<
 /** Mapping between all available schema types and the resolvers types */
 export type IResolversTypes = {
     Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
+    ChatMessage: ResolverTypeWrapper<IChatMessageModel>;
     CreateUserInput: ICreateUserInput;
     Cursor: ResolverTypeWrapper<Scalars['Cursor']['output']>;
     Date: ResolverTypeWrapper<Scalars['Date']['output']>;
@@ -305,6 +330,7 @@ export type IResolversTypes = {
     ID: ResolverTypeWrapper<Scalars['ID']['output']>;
     Int: ResolverTypeWrapper<Scalars['Int']['output']>;
     JSON: ResolverTypeWrapper<Scalars['JSON']['output']>;
+    MessageContentType: IMessageContentType;
     Mutation: ResolverTypeWrapper<{}>;
     PageInfo: ResolverTypeWrapper<IPageInfo>;
     PaginationInput: IPaginationInput;
@@ -326,6 +352,7 @@ export type IResolversTypes = {
 /** Mapping between all available schema types and the resolvers parents */
 export type IResolversParentTypes = {
     Boolean: Scalars['Boolean']['output'];
+    ChatMessage: IChatMessageModel;
     CreateUserInput: ICreateUserInput;
     Cursor: Scalars['Cursor']['output'];
     Date: Scalars['Date']['output'];
@@ -348,6 +375,28 @@ export type IResolversParentTypes = {
     };
     UserOnline: IUserOnline;
     changePasswordInput: IChangePasswordInput;
+};
+
+export type IChatMessageResolvers<
+    ContextType = any,
+    ParentType extends IResolversParentTypes['ChatMessage'] = IResolversParentTypes['ChatMessage']
+> = {
+    content?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
+    id?: Resolver<IResolversTypes['ID'], ParentType, ContextType>;
+    messageContentType?: Resolver<
+        Maybe<IResolversTypes['MessageContentType']>,
+        ParentType,
+        ContextType
+    >;
+    posted_at?: Resolver<IResolversTypes['Date'], ParentType, ContextType>;
+    posted_by?: Resolver<IResolversTypes['User'], ParentType, ContextType>;
+    read_count?: Resolver<
+        Maybe<IResolversTypes['Int']>,
+        ParentType,
+        ContextType
+    >;
+    room_id?: Resolver<IResolversTypes['Int'], ParentType, ContextType>;
+    __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export interface ICursorScalarConfig
@@ -530,6 +579,7 @@ export type IUserOnlineResolvers<
 };
 
 export type IResolvers<ContextType = any> = {
+    ChatMessage?: IChatMessageResolvers<ContextType>;
     Cursor?: GraphQLScalarType;
     Date?: GraphQLScalarType;
     JSON?: GraphQLScalarType;

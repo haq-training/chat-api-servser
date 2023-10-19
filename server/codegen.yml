@@ -10,3 +10,6 @@ generates:
     config:
       mappers:
         User: ../db_models/init-models#users
+        ChatMessage: ../mongodb_models/chatMessage#IChatMessageModel
+        ChatMessageEdge: ../mongodb_models/chatMessage#IChatMessageModel
+        ChatMessageConnection: ../mongodb_models/chatMessage#ChatMessageConnection

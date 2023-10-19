@@ -1,0 +1,19 @@
+
+enum MessageContentType {
+    text
+    image
+}
+
+type ChatMessage {
+    id: ID!
+    room_id: Int!
+    posted_at: Date!
+    posted_by: User!
+    content: String!
+    messageContentType: MessageContentType
+    """
+    Return number of read by another user for message send by own.
+    Return null if posted by another user.
+    """
+    read_count: Int
+}

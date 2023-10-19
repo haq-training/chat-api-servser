@@ -18,15 +18,16 @@ export const mongoLoader = async () => {
         })
         .then(async () => {
             if (process.env.NODE_ENV === 'development') {
-                for (const element of chatMessageData) {
-                    await chatMessage.findOneAndUpdate(
-                        { _id: element._id },
-                        element,
+                chatMessageData.forEach((element) => {
+                    console.log('chatMessageData', chatMessageData);
+                    return chatMessage.findOneAndUpdate(
+                        element as any,
+                        { element },
                         {
                             upsert: true,
                         }
                     );
-                }
+                });
                 console.log('Insert success');
             }
         })

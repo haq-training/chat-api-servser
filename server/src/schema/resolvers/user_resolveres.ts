@@ -1,7 +1,6 @@
-/* eslint-disable linebreak-style */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable linebreak-style */
-
+// eslint-disable-next-line import/extensions,@typescript-eslint/ban-ts-comment
+// @ts-ignore
+// eslint-disable-next-line import/extensions
 import bcrypt from 'bcrypt';
 import { Transaction } from 'sequelize';
 import { IResolvers, ISuccessResponse } from '../../__generated__/graphql';
@@ -9,18 +8,17 @@ import {
     MySQLError,
     UserNotFoundError,
     AuthenticationError,
-    TaskNotAllowUpdateError,
     UserAlreadyExistError,
 } from '../../lib/classes/graphqlErrors';
 import { generateJWT } from '../../lib/ultis/jwt';
 import { db, sequelize } from '../../db_loaders/mysql';
 import { storageConfig } from '../../config/appConfig';
-import { minIOServices } from '../../lib/classes';
-// import { ChatContext } from '../../server';
+import { minIOServices, pubsub_service } from '../../lib/classes';
 import { usersCreationAttributes } from '../../db_models/users';
 import { DefaultHashValue } from '../../lib/enum';
 import { checkAuthentication } from '../../lib/ultis/permision';
 import { iRoleToNumber } from '../../lib/enum_resolvers';
+import { IUserEvent, UserOnline } from '../../lib/classes/PubSubService';
 
 const userResolver: IResolvers = {
 
@@ -38,7 +36,7 @@ const userResolver: IResolvers = {
                 rejectOnEmpty: new UserNotFoundError(`User ID ${id} not found`),
             });
         },
-        login: async (_parent, { input }) => {
+        login: async (parent, { input }) => {
             const { account, password } = input;
             const user = await db.users.findOne({
                 where: {
@@ -53,6 +51,21 @@ const userResolver: IResolvers = {
                 throw new UserNotFoundError('Sai mật khẩu!!!');
             }
             const token = generateJWT(user.email, user.id, user.role);
+            user.status = true;
+            await user.save();
+            const ids = await db.users
+                .findAll({
+                    where: {
+                        status: true,
+                    },
+                })
+                .then((users) => users.map((eachUser) => eachUser.id));
+            const body = `${user.lastName} ${user.firstName} vừa online`;
+            const message: UserOnline = {
+                id: user.id,
+                body,
+            };
+            pubsub_service.sendOnlineMessage(message, ids);
             return {
                 token,
                 user,
@@ -232,7 +245,7 @@ const userResolver: IResolvers = {
                 User_changPass.password
             );
             if (!checkPassword) {
-                throw new TaskNotAllowUpdateError('Password không đúng!');
+                throw new UserNotFoundError('Password không đúng!');
             }
 
             const salt = bcrypt.genSaltSync(DefaultHashValue.saltRounds);
@@ -251,9 +264,20 @@ const userResolver: IResolvers = {
             if (!user_forgot) throw new UserNotFoundError('Invalid User');
             user_forgot.changePassword = 1;
             await user_forgot.save();
-
             return ISuccessResponse.Success;
         },
     },
+
+    Subscription: {
+        onlineTracker: {
+            subscribe: (parent, { userId }) =>
+                pubsub_service.asyncIteratorByUser(
+                    userId,
+                    IUserEvent.OnlineTracker
+                ),
+            resolve: async (message: UserOnline) => message,
+        },
+    },
 };
+
 export default userResolver;

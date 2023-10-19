@@ -3,6 +3,7 @@
 /* eslint-disable linebreak-style */
 import * as dotenv from 'dotenv';
 import { Options } from 'sequelize';
+import { IPubSubConfig } from '../lib/classes/PubSubService';
 
 dotenv.config();
 
@@ -51,4 +52,9 @@ export const storageConfig = {
         accessKey: process.env.MINIO_ACCESS || '',
         secretKey: process.env.MINIO_SECRET || '',
     },
+};
+
+export const redis: IPubSubConfig = {
+    host: process.env.REDIS_HOST || 'chat-redis',
+    port: parseInt(process.env.REDIS_PORT || '6379', 10),
 };

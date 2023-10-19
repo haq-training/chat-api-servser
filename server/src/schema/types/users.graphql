@@ -16,6 +16,12 @@ extend type Mutation {
     forgot_password(input : ForgotPassword!):SuccessResponse!
 }
 
+
+extend type Subscription {
+    onlineTracker(userId: Int!): UserOnline!
+}
+
+
 type User {
     id: Int!
     email: String!
@@ -63,4 +69,9 @@ type UserLoginResponse {
 }
 input ForgotPassword {
     gmail : String!
+}
+
+type UserOnline {
+    id: Int
+    body: String
 }

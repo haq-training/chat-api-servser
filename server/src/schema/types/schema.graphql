@@ -3,6 +3,7 @@
 schema {
     query: Query
     mutation: Mutation
+    subscription: Subscription
 }
 
 type Mutation {
@@ -28,6 +29,10 @@ type Query {
     users: [User]
 }
 
+type Subscription {
+    onlineTracker(userId: Int!): UserOnline!
+}
+
 type User {
     avatarUrl: String
     createdAt: Date
@@ -45,6 +50,11 @@ type User {
 type UserLoginResponse {
     token: String!
     user: User!
+}
+
+type UserOnline {
+    body: String
+    id: Int
 }
 
 enum SuccessResponse {

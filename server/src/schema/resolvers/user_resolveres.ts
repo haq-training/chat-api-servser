@@ -21,9 +21,17 @@ import { usersCreationAttributes } from '../../db_models/users';
 import { DefaultHashValue } from '../../lib/enum';
 import { checkAuthentication } from '../../lib/ultis/permision';
 import { iRoleToNumber } from '../../lib/enum_resolvers';
+import { ChatContext } from '../../server';
 
 const userResolver: IResolvers = {
-
+    User: {
+        avatarUrl: async (parent, _, context: ChatContext) => parent.avatarUrl
+                ? await minIOServices.generateDownloadURL(
+                      parent.avatarUrl,
+                      storageConfig.minIO.devApp
+                  )
+                : null,
+    },
     Query: {
         // eslint-disable-next-line no-empty-pattern
         users: async (_parent, {}, context) => {
@@ -59,14 +67,15 @@ const userResolver: IResolvers = {
             };
         },
         // eslint-disable-next-line no-empty-pattern
-        me: async (_parent,{},context) => {
+        me: async (_parent, {}, context) => {
             checkAuthentication(context);
-            const {user} = context;
+            const { user } = context;
             return await db.users.findByPk(user.id, {
-                rejectOnEmpty: new UserNotFoundError(`User ID ${user.id} not found`),
+                rejectOnEmpty: new UserNotFoundError(
+                    `User ID ${user.id} not found`
+                ),
             });
-        }
-
+        },
     },
     Mutation: {
         register: async (_parent, { input }) => {

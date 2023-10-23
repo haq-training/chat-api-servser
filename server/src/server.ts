@@ -17,6 +17,7 @@ import { Context, SubscribeMessage } from 'graphql-ws';
 import * as dotenv from 'dotenv';
 import { ExecutionArgs } from 'graphql';
 import { WebSocketServer } from 'ws';
+import cors from 'cors';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { expressMiddleware } from '@apollo/server/express4';
 import { ApolloServerPluginLandingPageGraphQLPlayground } from '@apollo/server-plugin-landing-page-graphql-playground';
@@ -174,6 +175,7 @@ async function startServer() {
     await server.start();
     // This middleware should be added before calling `applyMiddleware`.
     appSrv.use(graphqlUploadExpress());
+    appSrv.use(cors());
     appSrv.use(
         '/graphql',
         bodyParser.json(),

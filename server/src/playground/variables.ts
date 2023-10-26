@@ -58,6 +58,9 @@ export const variables = {
     },
     listFriend: {
     },
+    addFriend: {
+        id : 5,
+    },
 
 
 };

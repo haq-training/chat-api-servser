@@ -387,6 +387,7 @@ const userResolver: IResolvers = {
     });
     return ISuccessResponse.Success;
 },
+        // makeFriend
     },
 };
 export default userResolver;

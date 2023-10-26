@@ -307,6 +307,7 @@ const userResolver: IResolvers = {
                 }
             });
         },
+
         ChangePassword: async (_parent, { input }, context) => {
             checkAuthentication(context);
             const { user } = context;

@@ -179,7 +179,7 @@ export class users
                     allowNull: true,
                 },
                 story: {
-                    type: DataTypes.STRING(100),
+                    type: DataTypes.STRING(250),
                     allowNull: true,
                 },
                 role: {

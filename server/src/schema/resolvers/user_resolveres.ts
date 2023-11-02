@@ -347,47 +347,219 @@ const userResolver: IResolvers = {
 
             return ISuccessResponse.Success;
         },
-        addFriend : async (_parent,{id},context)=>{
-    checkAuthentication(context);
-    const {user} = context;
-    const user_add =  await db.users.findByPk(id,{
-        rejectOnEmpty: new UserNotFoundError(),
-    });
-    if(user.id === parseInt(id,10)){
-        throw new Error('khong the tu gui ket ban cho chinh minh');
-    }
-    const check_user = await db.FriendshipStatus.findOne({
-        where: {
-            RequesterId: parseInt(id,10),
-            AddresseeId: user.id,
-            SpecifiedDateTime: sequelize.literal(
-                `(SELECT MAX(SpecifiedDateTime) FROM FriendshipStatus AS NestedFS
-    WHERE NestedFS.RequesterId = FriendshipStatus.RequesterId
-    AND NestedFS.AddresseeId = FriendshipStatus.AddresseeId)`
-            ),
+        addFriend : async (_parent,{email},context)=>{
+            checkAuthentication(context);
+            const {user} = context;
+            const user_add =  await db.users.findOne({
+                where: {
+                    email,
+                },
+                rejectOnEmpty: false,
+
+            });
+            if(user.id === user_add.id){
+                throw new Error('khong the tu gui ket ban cho chinh minh');
+            }
+            const check_FriendShip = await db.FriendshipStatus.findOne({
+                where: {
+                    [Op.or]: [
+                        {
+                            RequesterId: user.id,
+                            AddresseeId: user_add.id,
+                        },
+                        {
+                            RequesterId: user_add.id,
+                            AddresseeId: user.id,
+                        },
+                    ],
+                },
+                order: [['SpecifiedDateTime', 'DESC']],
+            });
+            if(check_FriendShip){
+                if(check_FriendShip.StatusCode === StatusFriend.Requested){
+                    if(check_FriendShip.RequesterId === user.id){
+                        throw new Error(`${user_add.firstName  } ban da gui loi moi ket ban denb ho `);
+                    }
+                    await sequelize.transaction(async (t) => {
+                        try{
+                            await db.FriendshipStatus.create({
+                                RequesterId: user_add.id,
+                                AddresseeId : user.id,
+                                StatusCode : StatusFriend.Accepted,
+                                SpecifierId : user.id
+                            },{
+                                transaction: t,
+                            });
+                            // await  db.Friendship.create({
+                            //     RequesterId :  user.id,
+                            //     AddresseeId : user_add.id
+                            // },{
+                            //     transaction : t,
+                            // });
+                        } catch (error) {
+                            await t.rollback();
+                            throw new MySQLError(
+                                `Lỗi bất thường khi thao tác trong cơ sở dữ liệu: ${error}`
+                            );
+                        }
+                    });
+                }
+                if(check_FriendShip.StatusCode === StatusFriend.Blocked){
+                    throw new Error(`${user_add.firstName  }da block ban `);
+                }
+                if(check_FriendShip.StatusCode === StatusFriend.Accepted){
+                    throw new Error(`${user_add.firstName  } da la ban be`);
+                }
+            } else {
+                await db.FriendshipStatus.create({
+                    RequesterId: user.id,
+                    AddresseeId : user_add.id,
+                    StatusCode : StatusFriend.Requested,
+                    SpecifierId : user.id
+                });
+            }
+            return ISuccessResponse.Success;
         },
-        rejectOnEmpty: false,
-    });
-    if(check_user){
-        if(check_user.StatusCode === StatusFriend.Requested){
-            throw new Error(`${user_add.firstName  }da gui loi moi ket ban cho ban`);
+        unFriend : async (_parent,{email},context) =>{
+            checkAuthentication(context);
+            const { user } = context;
+            const check_user_unfriend =  await db.users.findOne({
+                where: {
+                    email,
+                },
+                rejectOnEmpty: false,
+
+            });
+            if(!check_user_unfriend){
+                throw new UserNotFoundError;
+            }
+            if(user.id === check_user_unfriend.id){
+                throw new Error('khong the hanh dong voi chinh ban');
+            }
+            const check_friendShip = await db.FriendshipStatus.findOne({
+                where: {
+                    [Op.or]: [
+                        {
+                            RequesterId: user.id,
+                            AddresseeId: check_user_unfriend.id,
+                        },
+                        {
+                            RequesterId: check_user_unfriend.id,
+                            AddresseeId: user.id,
+                        },
+                    ],
+                },
+                order: [['SpecifiedDateTime', 'DESC']],
+            });
+            if(check_friendShip){
+                if(check_friendShip.StatusCode === StatusFriend.Blocked){
+                    throw new Error(`${check_user_unfriend.firstName  } da block `);
+                }
+                if(check_friendShip.StatusCode === StatusFriend.Accepted || check_friendShip.StatusCode === StatusFriend.Requested){
+                    await sequelize.transaction(async (t) => {
+                        try{
+                            // await db.Friendship.destroy({
+                            //     where: {
+                            //         [Op.or]: [
+                            //             { RequesterId: check_friendShip.id ,AddresseeId: user.id},
+                            //             { AddresseeId: user.id ,RequesterId: check_friendShip.id}
+                            //         ],
+                            //     },
+                            //     transaction: t,
+                            // });
+                            await db.FriendshipStatus.create({
+                                RequesterId: check_friendShip.RequesterId,
+                                AddresseeId : check_friendShip.AddresseeId,
+                                StatusCode : StatusFriend.Declined,
+                                SpecifierId : user.id
+                            },{
+                                transaction: t,
+                            });
+                        } catch (error) {
+                            await t.rollback();
+                            throw new MySQLError(
+                                `Lỗi bất thường khi thao tác trong cơ sở dữ liệu: ${error}`
+                            );
+                        }
+                    });
+                }
+            }else{
+                throw new Error(`${check_user_unfriend.firstName  }cac ban chua phai la ban be`);
+            }
+            return ISuccessResponse.Success;
+        },
+        block_user :async (_parent,{email},context)=>{
+            checkAuthentication(context);
+            const {user}=context;
+            const user_block =  await db.users.findOne({
+                where: {
+                    email,
+                },
+                rejectOnEmpty: false,
+
+            });
+            if(!user_block){
+                throw new UserNotFoundError();
+            }
+            if(user.id === user_block.id){
+                throw new Error('khong the tu block chinh minh');
+            }
+            const check_relationship = await db.FriendshipStatus.findOne({
+                where: {
+                    [Op.or]: [
+                        {
+                            RequesterId: user.id,
+                            AddresseeId: user_block.id,
+                        },
+                        {
+                            RequesterId: user_block.id,
+                            AddresseeId: user.id,
+                        },
+                    ],
+                },
+                order: [['SpecifiedDateTime', 'DESC']],
+            });
+            if(check_relationship){
+                if(check_relationship.StatusCode === StatusFriend.Blocked){
+                    throw new Error('mqh khong ton tai');
+                }else{
+                    await sequelize.transaction(async (t) => {
+                        try{
+                            await db.FriendshipStatus.create({
+                                RequesterId: check_relationship.RequesterId,
+                                AddresseeId : check_relationship.AddresseeId,
+                                StatusCode : StatusFriend.Blocked,
+                                SpecifierId : user.id
+                            },{
+                                transaction: t,
+                            });
+                            // await db.Friendship.destroy({
+                            //     where: {
+                            //         [Op.or]: [
+                            //             { RequesterId: check_friendShip.id ,AddresseeId: user.id},
+                            //             { AddresseeId: user.id ,RequesterId: check_friendShip.id}
+                            //         ],
+                            //     },
+                            //     transaction: t,
+                            // });
+                        } catch (error) {
+                            await t.rollback();
+                            throw new MySQLError(
+                                `Lỗi bất thường khi thao tác trong cơ sở dữ liệu: ${error}`
+                            );
+                        }
+                    });
+                }
+            }else{
+                await db.FriendshipStatus.create({
+                    RequesterId: user.id,
+                    AddresseeId : user_block.id,
+                    StatusCode : StatusFriend.Blocked,
+                    SpecifierId : user.id
+                });
+            }
+            return ISuccessResponse.Success;
         }
-        if(check_user.StatusCode === StatusFriend.Blocked){
-            throw new Error(`${user_add.firstName  }da block ban `);
-        }
-        if(check_user.StatusCode === StatusFriend.Accepted){
-            throw new Error(`${user_add.firstName  } da la ban be`);
-        }
-    }
-    await db.FriendshipStatus.create({
-        RequesterId: user.id,
-        AddresseeId : parseInt(id,10),
-        StatusCode : StatusFriend.Requested,
-        SpecifierId : user.id
-    });
-    return ISuccessResponse.Success;
-},
-        // makeFriend
     },
 };
 export default userResolver;

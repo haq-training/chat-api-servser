@@ -1,0 +1,3 @@
+mutation block_user($email: String!) {
+    block_user(email: $email)
+}

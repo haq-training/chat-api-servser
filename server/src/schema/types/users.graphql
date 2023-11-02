@@ -10,11 +10,12 @@ extend type Mutation {
     register(input: CreateUserInput!): User!
     updateUser(input:UpdateUserInput!):SuccessResponse!
     upRoleUser(id:ID!):SuccessResponse!
-    addFriend(id:ID!):SuccessResponse!
-    unFriend(id:ID!):SuccessResponse!
+    addFriend(email:String!):SuccessResponse!
+    unFriend(email:String!):SuccessResponse!
     ChangePassword(input : changePasswordInput!):SuccessResponse!
     delete_user(id:ID!):SuccessResponse!
     forgot_password(input : ForgotPassword!):SuccessResponse!
+    block_user(email:String!):SuccessResponse!
 }
 
 type User {

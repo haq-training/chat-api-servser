@@ -62,6 +62,7 @@ export type IMutation = {
     __typename?: 'Mutation';
     ChangePassword: ISuccessResponse;
     addFriend: ISuccessResponse;
+    block_user: ISuccessResponse;
     delete_user: ISuccessResponse;
     forgot_password: ISuccessResponse;
     register: IUser;
@@ -75,7 +76,11 @@ export type IMutationChangePasswordArgs = {
 };
 
 export type IMutationAddFriendArgs = {
-    id: Scalars['ID']['input'];
+    email: Scalars['String']['input'];
+};
+
+export type IMutationBlock_UserArgs = {
+    email: Scalars['String']['input'];
 };
 
 export type IMutationDelete_UserArgs = {
@@ -91,7 +96,7 @@ export type IMutationRegisterArgs = {
 };
 
 export type IMutationUnFriendArgs = {
-    id: Scalars['ID']['input'];
+    email: Scalars['String']['input'];
 };
 
 export type IMutationUpRoleUserArgs = {
@@ -376,7 +381,13 @@ export type IMutationResolvers<
         IResolversTypes['SuccessResponse'],
         ParentType,
         ContextType,
-        RequireFields<IMutationAddFriendArgs, 'id'>
+        RequireFields<IMutationAddFriendArgs, 'email'>
+    >;
+    block_user?: Resolver<
+        IResolversTypes['SuccessResponse'],
+        ParentType,
+        ContextType,
+        RequireFields<IMutationBlock_UserArgs, 'email'>
     >;
     delete_user?: Resolver<
         IResolversTypes['SuccessResponse'],
@@ -400,7 +411,7 @@ export type IMutationResolvers<
         IResolversTypes['SuccessResponse'],
         ParentType,
         ContextType,
-        RequireFields<IMutationUnFriendArgs, 'id'>
+        RequireFields<IMutationUnFriendArgs, 'email'>
     >;
     upRoleUser?: Resolver<
         IResolversTypes['SuccessResponse'],

@@ -59,8 +59,15 @@ export const variables = {
     listFriend: {
     },
     addFriend: {
-        id : 5,
+        email : 'nataliemayreed@live.com',
     },
+    unFriend: {
+        email : 'nataliemayreed@live.com',
+    },
+    block_user: {
+        email : 'nataliemayreed@live.com',
+    },
+
 
 
 };

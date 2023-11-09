@@ -3,7 +3,7 @@ import { Sequelize } from 'sequelize';
 import { database } from '../config/appConfig';
 import { initModels } from '../db_models/init-models';
 import users from '../test_data/users.json';
-import  friendStatus from '../test_data/friendstatus.json';
+import  HistoryFriendShip from '../test_data/HistoryFriendShip.json';
 import friendship from '../test_data/friendship.json';
 
 export const sequelize = new Sequelize(
@@ -32,8 +32,8 @@ export const syncDatabase = async () => {
             .then(async () => {
                 if (isForceSync) {
                     await models.users.bulkCreate(users as any);
-                    await models.FriendshipStatus.bulkCreate(friendStatus as any);
-                    await models.Friendship.bulkCreate(friendship as any);
+                    // await models.Friendship.bulkCreate(friendship as any);
+                    // await models.HistoryFriendShip.bulkCreate(HistoryFriendShip as any);
                 }
             })
             .catch((err) => {
@@ -41,5 +41,6 @@ export const syncDatabase = async () => {
             });
     }
 };
+
 
 export * as db from '../db_models/init-models';

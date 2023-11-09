@@ -11,11 +11,12 @@ extend type Mutation {
     updateUser(input:UpdateUserInput!):SuccessResponse!
     upRoleUser(id:ID!):SuccessResponse!
     addFriend(email:String!):SuccessResponse!
-    unFriend(email:String!):SuccessResponse!
+    unFriend(id:ID!):SuccessResponse!
     ChangePassword(input : changePasswordInput!):SuccessResponse!
     delete_user(id:ID!):SuccessResponse!
     forgot_password(input : ForgotPassword!):SuccessResponse!
-    block_user(email:String!):SuccessResponse!
+    block_user(id:ID!):SuccessResponse!
+    unblock_user(id:ID!):SuccessResponse!
 }
 
 type User {

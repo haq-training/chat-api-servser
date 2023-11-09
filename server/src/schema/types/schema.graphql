@@ -8,11 +8,12 @@ schema {
 type Mutation {
     ChangePassword(input: changePasswordInput!): SuccessResponse!
     addFriend(email: String!): SuccessResponse!
-    block_user(email: String!): SuccessResponse!
+    block_user(id: ID!): SuccessResponse!
     delete_user(id: ID!): SuccessResponse!
     forgot_password(input: ForgotPassword!): SuccessResponse!
     register(input: CreateUserInput!): User!
-    unFriend(email: String!): SuccessResponse!
+    unFriend(id: ID!): SuccessResponse!
+    unblock_user(id: ID!): SuccessResponse!
     upRoleUser(id: ID!): SuccessResponse!
     updateUser(input: UpdateUserInput!): SuccessResponse!
 }

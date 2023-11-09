@@ -284,7 +284,7 @@ const userResolver: IResolvers = {
                         },
                         transaction: t,
                     });
-                    await db.FriendshipStatus.destroy({
+                    await db.HistoryFriendShip.destroy({
                         where: {
                             [Op.or]: [
                                 { RequesterId: parseInt(id,10) },
@@ -360,7 +360,7 @@ const userResolver: IResolvers = {
             if(user.id === user_add.id){
                 throw new Error('khong the tu gui ket ban cho chinh minh');
             }
-            const check_FriendShip = await db.FriendshipStatus.findOne({
+            const check_FriendShip = await db.HistoryFriendShip.findOne({
                 where: {
                     [Op.or]: [
                         {
@@ -382,7 +382,7 @@ const userResolver: IResolvers = {
                     }
                     await sequelize.transaction(async (t) => {
                         try{
-                            await db.FriendshipStatus.create({
+                            await db.HistoryFriendShip.create({
                                 RequesterId: user_add.id,
                                 AddresseeId : user.id,
                                 StatusCode : StatusFriend.Accepted,
@@ -411,7 +411,7 @@ const userResolver: IResolvers = {
                     throw new Error(`${user_add.firstName  } da la ban be`);
                 }
             } else {
-                await db.FriendshipStatus.create({
+                await db.HistoryFriendShip.create({
                     RequesterId: user.id,
                     AddresseeId : user_add.id,
                     StatusCode : StatusFriend.Requested,
@@ -420,23 +420,21 @@ const userResolver: IResolvers = {
             }
             return ISuccessResponse.Success;
         },
-        unFriend : async (_parent,{email},context) =>{
+        unFriend : async (_parent,{id},context) =>{
             checkAuthentication(context);
             const { user } = context;
-            const check_user_unfriend =  await db.users.findOne({
-                where: {
-                    email,
-                },
-                rejectOnEmpty: false,
+            const check_user_unfriend =  await db.users.findByPk(id,{
+                   rejectOnEmpty: false,
 
             });
             if(!check_user_unfriend){
                 throw new UserNotFoundError;
+
             }
             if(user.id === check_user_unfriend.id){
                 throw new Error('khong the hanh dong voi chinh ban');
             }
-            const check_friendShip = await db.FriendshipStatus.findOne({
+            const check_friendShip = await db.HistoryFriendShip.findOne({
                 where: {
                     [Op.or]: [
                         {
@@ -467,7 +465,7 @@ const userResolver: IResolvers = {
                             //     },
                             //     transaction: t,
                             // });
-                            await db.FriendshipStatus.create({
+                            await db.HistoryFriendShip.create({
                                 RequesterId: check_friendShip.RequesterId,
                                 AddresseeId : check_friendShip.AddresseeId,
                                 StatusCode : StatusFriend.Declined,
@@ -488,13 +486,10 @@ const userResolver: IResolvers = {
             }
             return ISuccessResponse.Success;
         },
-        block_user :async (_parent,{email},context)=>{
+        block_user :async (_parent,{id},context)=>{
             checkAuthentication(context);
             const {user}=context;
-            const user_block =  await db.users.findOne({
-                where: {
-                    email,
-                },
+            const user_block =  await db.users.findByPk(id,{
                 rejectOnEmpty: false,
 
             });
@@ -504,7 +499,7 @@ const userResolver: IResolvers = {
             if(user.id === user_block.id){
                 throw new Error('khong the tu block chinh minh');
             }
-            const check_relationship = await db.FriendshipStatus.findOne({
+            const check_relationship = await db.HistoryFriendShip.findOne({
                 where: {
                     [Op.or]: [
                         {
@@ -525,7 +520,7 @@ const userResolver: IResolvers = {
                 }else{
                     await sequelize.transaction(async (t) => {
                         try{
-                            await db.FriendshipStatus.create({
+                            await db.HistoryFriendShip.create({
                                 RequesterId: check_relationship.RequesterId,
                                 AddresseeId : check_relationship.AddresseeId,
                                 StatusCode : StatusFriend.Blocked,
@@ -551,7 +546,7 @@ const userResolver: IResolvers = {
                     });
                 }
             }else{
-                await db.FriendshipStatus.create({
+                await db.HistoryFriendShip.create({
                     RequesterId: user.id,
                     AddresseeId : user_block.id,
                     StatusCode : StatusFriend.Blocked,
@@ -562,4 +557,5 @@ const userResolver: IResolvers = {
         }
     },
 };
+
 export default userResolver;

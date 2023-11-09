@@ -145,7 +145,7 @@ export const queryExample = async (
         },
         {
             endpoint: path,
-            name: 'ket ban ',
+            name: 'block',
             query: block_user,
             variables: prettifyJsonString(variables.block_user),
             headers: userAuth,

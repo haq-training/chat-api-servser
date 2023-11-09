@@ -62,10 +62,10 @@ export const variables = {
         email : 'nataliemayreed@live.com',
     },
     unFriend: {
-        email : 'nataliemayreed@live.com',
+        id : 3,
     },
     block_user: {
-        email : 'nataliemayreed@live.com',
+        id : 3,
     },
 
 

@@ -7,7 +7,7 @@
         "test": "jest",
         "build:live": "nodemon src/server.ts --ignore 'test/*'",
         "start": "npm run build:live",
-        "models-gen": "sequelize-auto -h 127.0.0.1 -d chat-mysql -u admin -x training2023PDC -p 3307 --dialect mysql -o \"./src/db_models\" -l ts && npm run lint:fix-model && npm run prettier:models",
+        "models-gen": "sequelize-auto -h 192.168.1.12 -d chat-mysql -u admin -x training2023PDC -p 3307 --dialect mysql -o \"./src/db_models\" -l ts && npm run lint:fix-model && npm run prettier:models",
         "prettier:models": "npm run prettier:base -- --write  \"src/db_models/*.ts\"",
         "lint:fix-model": "eslint --fix --ext .ts ./src/db_models",
         "prettier:base": "prettier --parser typescript --single-quote --tab-width 4",

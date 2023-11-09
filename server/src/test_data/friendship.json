@@ -1,4 +1,5 @@
 [
-  {"id":1,"RequesterId" : 1 ,"AddresseeId": 5 ,"CreatedDateTime": "2023-08-25 09:09:59"},
-  {"id":2,"RequesterId" : 1,"AddresseeId":  7,"CreatedDateTime": "2023-08-26 10:09:59" }
+  { "RequesterId":1, "AddresseeId":3, "SpecifiedDateTime":"2023-08-28 09:09:59", "StatusCode":"B"},
+  {"RequesterId" : 1 ,"AddresseeId": 5 ,"CreatedDateTime": "2023-08-25 09:09:59", "StatusCode":"A"},
+  {"RequesterId" : 1,"AddresseeId":  7,"CreatedDateTime": "2023-08-26 10:09:59" , "StatusCode":"A"}
 ]

@@ -68,6 +68,7 @@ const userResolver: IResolvers = {
                         { RequesterId: user.id },
                         { AddresseeId: user.id },
                     ],
+                    StatusCode : StatusFriend.Accepted
                 },
                 attributes: [
                     [sequelize.literal('CASE WHEN `RequesterId` = :userId THEN `AddresseeId` ELSE `RequesterId` END'), 'friendId'],
@@ -75,9 +76,25 @@ const userResolver: IResolvers = {
                 raw: true,
                 replacements: { userId: user.id },
             });
+            const friendships_block = await db.Friendship.findAll({
+                where: {
+                    [Op.or]: [
+                        { RequesterId: user.id },
+                        { AddresseeId: user.id },
+                    ],
+                    StatusCode : StatusFriend.Blocked
+                },
+                attributes: [
+                    [sequelize.literal('CASE WHEN `RequesterId` = :userId THEN `AddresseeId` ELSE `RequesterId` END'), 'friend_block_Id'],
+                ],
+                raw: true,
+                replacements: { userId: user.id },
+            });
 
             const friendIds = friendships.map(element => (element as unknown as { friendId: number }).friendId);
             const uniqueFriendIds = [...new Set(friendIds)];
+            const friend_Block_Ids = friendships_block.map(element => (element as unknown as { friend_block_Id: number }).friend_block_Id);
+            const uniqueFriend_Block_Ids = [...new Set(friend_Block_Ids)];
             interface User {
                 id: number;
                 email: string
@@ -89,6 +106,7 @@ const userResolver: IResolvers = {
                 story: string
             }
             const userInfos: User[] = [];
+            const user_block_Infos: User[] = [];
             async function fetchUserData(element : any) {
                 return {
                     id: element.id,
@@ -106,6 +124,11 @@ const userResolver: IResolvers = {
                 const userData = await fetchUserData(userInfo);
                 return userData;
             });
+            const promises_block = uniqueFriend_Block_Ids.map(async (element) => {
+                const userInfo = await db.users.findByPk(element);
+                const userData = await fetchUserData(userInfo);
+                return userData;
+            });
 
              await Promise.all(promises)
                 .then((userInfosData) => {
@@ -114,7 +137,17 @@ const userResolver: IResolvers = {
                 .catch((error) => {
                     console.error(error);
                 });
-            return userInfos;
+            await Promise.all(promises_block)
+                .then((userInfosData) => {
+                    user_block_Infos.push(...userInfosData);
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+            return{
+                friend : userInfos,
+                block : user_block_Infos,
+            };
         },
         // eslint-disable-next-line no-empty-pattern
         me: async (_parent,{},context) => {
@@ -125,6 +158,7 @@ const userResolver: IResolvers = {
             });
         },
     },
+
     Mutation: {
         register: async (_parent, { input }) => {
             const {
@@ -275,7 +309,7 @@ const userResolver: IResolvers = {
             }
             return sequelize.transaction(async (t) => {
                 try{
-                    await db.Friendship.destroy({
+                    await db.HistoryFriendShip.destroy({
                         where: {
                             [Op.or]: [
                                 { RequesterId: parseInt(id,10) },
@@ -284,7 +318,7 @@ const userResolver: IResolvers = {
                         },
                         transaction: t,
                     });
-                    await db.HistoryFriendShip.destroy({
+                    await db.Friendship.destroy({
                         where: {
                             [Op.or]: [
                                 { RequesterId: parseInt(id,10) },
@@ -307,7 +341,6 @@ const userResolver: IResolvers = {
                 }
             });
         },
-
         ChangePassword: async (_parent, { input }, context) => {
             checkAuthentication(context);
             const { user } = context;
@@ -355,12 +388,11 @@ const userResolver: IResolvers = {
                     email,
                 },
                 rejectOnEmpty: false,
-
             });
             if(user.id === user_add.id){
                 throw new Error('khong the tu gui ket ban cho chinh minh');
             }
-            const check_FriendShip = await db.HistoryFriendShip.findOne({
+            const check_FriendShip_history = await db.Friendship.findOne({
                 where: {
                     [Op.or]: [
                         {
@@ -373,29 +405,47 @@ const userResolver: IResolvers = {
                         },
                     ],
                 },
-                order: [['SpecifiedDateTime', 'DESC']],
             });
-            if(check_FriendShip){
-                if(check_FriendShip.StatusCode === StatusFriend.Requested){
-                    if(check_FriendShip.RequesterId === user.id){
+            if(check_FriendShip_history){
+                if(check_FriendShip_history.StatusCode === StatusFriend.Requested){
+                    if(check_FriendShip_history.RequesterId === user.id){
                         throw new Error(`${user_add.firstName  } ban da gui loi moi ket ban denb ho `);
                     }
+                        check_FriendShip_history.StatusCode = StatusFriend.Accepted;
+                        await sequelize.transaction(async (t) => {
+                            try{
+                                await check_FriendShip_history.save();
+                                await db.HistoryFriendShip.create({
+                                    FriendshipID : check_FriendShip_history.Id,
+                                    RequesterId: user_add.id,
+                                    AddresseeId : user.id,
+                                    StatusCode : StatusFriend.Accepted,
+                                    SpecifierId : user.id
+                                },{
+                                    transaction: t,
+                                });
+                            } catch (error) {
+                                await t.rollback();
+                                throw new MySQLError(
+                                    `Lỗi bất thường khi thao tác trong cơ sở dữ liệu: ${error}`
+                                );
+                            }
+                        });
+                }
+                if(check_FriendShip_history.StatusCode === StatusFriend.Declined){
+                    check_FriendShip_history.StatusCode = StatusFriend.Requested;
                     await sequelize.transaction(async (t) => {
                         try{
+                            await check_FriendShip_history.save();
                             await db.HistoryFriendShip.create({
-                                RequesterId: user_add.id,
-                                AddresseeId : user.id,
-                                StatusCode : StatusFriend.Accepted,
+                                FriendshipID : check_FriendShip_history.Id,
+                                RequesterId: check_FriendShip_history.RequesterId,
+                                AddresseeId : check_FriendShip_history.AddresseeId,
+                                StatusCode : StatusFriend.Requested,
                                 SpecifierId : user.id
                             },{
                                 transaction: t,
                             });
-                            // await  db.Friendship.create({
-                            //     RequesterId :  user.id,
-                            //     AddresseeId : user_add.id
-                            // },{
-                            //     transaction : t,
-                            // });
                         } catch (error) {
                             await t.rollback();
                             throw new MySQLError(
@@ -404,18 +454,37 @@ const userResolver: IResolvers = {
                         }
                     });
                 }
-                if(check_FriendShip.StatusCode === StatusFriend.Blocked){
+                if(check_FriendShip_history.StatusCode === StatusFriend.Blocked){
                     throw new Error(`${user_add.firstName  }da block ban `);
                 }
-                if(check_FriendShip.StatusCode === StatusFriend.Accepted){
+                if(check_FriendShip_history.StatusCode === StatusFriend.Accepted){
                     throw new Error(`${user_add.firstName  } da la ban be`);
                 }
             } else {
-                await db.HistoryFriendShip.create({
-                    RequesterId: user.id,
-                    AddresseeId : user_add.id,
-                    StatusCode : StatusFriend.Requested,
-                    SpecifierId : user.id
+                await sequelize.transaction(async (t) => {
+                    try{
+                        const Friendship_new =  await db.Friendship.create({
+                            RequesterId : user.id,
+                            AddresseeId : user_add.id,
+                            StatusCode : StatusFriend.Requested
+                        },{
+                            transaction: t,
+                        });
+                        await db.HistoryFriendShip.create({
+                            FriendshipID: Friendship_new.Id,
+                            RequesterId : user.id,
+                            AddresseeId : user_add.id,
+                            StatusCode : StatusFriend.Requested,
+                            SpecifierId : user.id
+                        },{
+                            transaction: t,
+                        });
+                    } catch (error) {
+                        await t.rollback();
+                        throw new MySQLError(
+                            `Lỗi bất thường khi thao tác trong cơ sở dữ liệu: ${error}`
+                        );
+                    }
                 });
             }
             return ISuccessResponse.Success;
@@ -434,7 +503,7 @@ const userResolver: IResolvers = {
             if(user.id === check_user_unfriend.id){
                 throw new Error('khong the hanh dong voi chinh ban');
             }
-            const check_friendShip = await db.HistoryFriendShip.findOne({
+            const check_friendShip_history = await db.Friendship.findOne({
                 where: {
                     [Op.or]: [
                         {
@@ -447,39 +516,32 @@ const userResolver: IResolvers = {
                         },
                     ],
                 },
-                order: [['SpecifiedDateTime', 'DESC']],
             });
-            if(check_friendShip){
-                if(check_friendShip.StatusCode === StatusFriend.Blocked){
+            if(check_friendShip_history){
+                if(check_friendShip_history.StatusCode === StatusFriend.Blocked){
                     throw new Error(`${check_user_unfriend.firstName  } da block `);
                 }
-                if(check_friendShip.StatusCode === StatusFriend.Accepted || check_friendShip.StatusCode === StatusFriend.Requested){
-                    await sequelize.transaction(async (t) => {
-                        try{
-                            // await db.Friendship.destroy({
-                            //     where: {
-                            //         [Op.or]: [
-                            //             { RequesterId: check_friendShip.id ,AddresseeId: user.id},
-                            //             { AddresseeId: user.id ,RequesterId: check_friendShip.id}
-                            //         ],
-                            //     },
-                            //     transaction: t,
-                            // });
-                            await db.HistoryFriendShip.create({
-                                RequesterId: check_friendShip.RequesterId,
-                                AddresseeId : check_friendShip.AddresseeId,
-                                StatusCode : StatusFriend.Declined,
-                                SpecifierId : user.id
-                            },{
-                                transaction: t,
-                            });
-                        } catch (error) {
-                            await t.rollback();
-                            throw new MySQLError(
-                                `Lỗi bất thường khi thao tác trong cơ sở dữ liệu: ${error}`
-                            );
-                        }
-                    });
+                if(check_friendShip_history.StatusCode === StatusFriend.Accepted){
+                        check_friendShip_history.StatusCode = StatusFriend.Declined;
+                        await sequelize.transaction(async (t) => {
+                            try{
+                                await check_friendShip_history.save();
+                                await db.HistoryFriendShip.create({
+                                    FriendshipID : check_friendShip_history.Id,
+                                    RequesterId: check_friendShip_history.RequesterId,
+                                    AddresseeId : check_friendShip_history.AddresseeId,
+                                    StatusCode : StatusFriend.Declined,
+                                    SpecifierId : user.id
+                                },{
+                                    transaction: t,
+                                });
+                            } catch (error) {
+                                await t.rollback();
+                                throw new MySQLError(
+                                    `Lỗi bất thường khi thao tác trong cơ sở dữ liệu: ${error}`
+                                );
+                            }
+                        });
                 }
             }else{
                 throw new Error(`${check_user_unfriend.firstName  }cac ban chua phai la ban be`);
@@ -499,7 +561,7 @@ const userResolver: IResolvers = {
             if(user.id === user_block.id){
                 throw new Error('khong the tu block chinh minh');
             }
-            const check_relationship = await db.HistoryFriendShip.findOne({
+            const check_friendship_history = await db.Friendship.findOne({
                 where: {
                     [Op.or]: [
                         {
@@ -512,50 +574,123 @@ const userResolver: IResolvers = {
                         },
                     ],
                 },
+            });
+            if(check_friendship_history){
+                if(check_friendship_history.StatusCode === StatusFriend.Blocked){
+                    throw new Error('mqh khong ton tai');
+                }
+                check_friendship_history.StatusCode = StatusFriend.Blocked;
+                        await sequelize.transaction(async (t) => {
+                            try{
+                                await check_friendship_history.save();
+                                await db.HistoryFriendShip.create({
+                                    FriendshipID : check_friendship_history.Id,
+                                    RequesterId: check_friendship_history.RequesterId,
+                                    AddresseeId : check_friendship_history.AddresseeId,
+                                    StatusCode : StatusFriend.Blocked,
+                                    SpecifierId : user.id
+                                },{
+                                    transaction: t,
+                                });
+                            } catch (error) {
+                                await t.rollback();
+                                throw new MySQLError(
+                                    `Lỗi bất thường khi thao tác trong cơ sở dữ liệu: ${error}`
+                                );
+                            }
+                        });
+            }else{
+                await sequelize.transaction(async (t) => {
+                 try{
+                    const Friendship_block =  await db.Friendship.create({
+                        RequesterId : user.id,
+                        AddresseeId : user_block.id,
+                        StatusCode : StatusFriend.Blocked
+                    },{
+                        transaction: t,
+                    });
+                    await db.HistoryFriendShip.create({
+                        FriendshipID: Friendship_block.Id,
+                        RequesterId : user.id,
+                        AddresseeId : user_block.id,
+                        StatusCode : StatusFriend.Blocked,
+                        SpecifierId : user.id
+                    },{
+                        transaction: t,
+                    });
+                } catch (error) {
+                    await t.rollback();
+                    throw new MySQLError(
+                        `Lỗi bất thường khi thao tác trong cơ sở dữ liệu: ${error}`
+                    );
+                }
+            });
+            }
+            return ISuccessResponse.Success;
+        },
+        unblock_user : async (_parent,{id},context)=>{
+            checkAuthentication(context);
+            const {user}=context;
+            const user_un_block =  await db.users.findByPk(id,{
+                rejectOnEmpty: false,
+
+            });
+            if(!user_un_block){
+                throw new UserNotFoundError();
+            }
+            if(user.id === user_un_block.id){
+                throw new Error('khong the tu block chinh minh');
+            }
+            const check_friendship_history = await db.HistoryFriendShip.findOne({
+                where: {
+                    [Op.or]: [
+                        {
+                            RequesterId: user.id,
+                            AddresseeId: user_un_block.id,
+                        },
+                        {
+                            RequesterId: user_un_block.id,
+                            AddresseeId: user.id,
+                        },
+                    ],
+                },
                 order: [['SpecifiedDateTime', 'DESC']],
             });
-            if(check_relationship){
-                if(check_relationship.StatusCode === StatusFriend.Blocked){
-                    throw new Error('mqh khong ton tai');
-                }else{
-                    await sequelize.transaction(async (t) => {
-                        try{
-                            await db.HistoryFriendShip.create({
-                                RequesterId: check_relationship.RequesterId,
-                                AddresseeId : check_relationship.AddresseeId,
-                                StatusCode : StatusFriend.Blocked,
-                                SpecifierId : user.id
-                            },{
-                                transaction: t,
-                            });
-                            // await db.Friendship.destroy({
-                            //     where: {
-                            //         [Op.or]: [
-                            //             { RequesterId: check_friendShip.id ,AddresseeId: user.id},
-                            //             { AddresseeId: user.id ,RequesterId: check_friendShip.id}
-                            //         ],
-                            //     },
-                            //     transaction: t,
-                            // });
-                        } catch (error) {
-                            await t.rollback();
-                            throw new MySQLError(
-                                `Lỗi bất thường khi thao tác trong cơ sở dữ liệu: ${error}`
-                            );
-                        }
-                    });
+            if(check_friendship_history){
+                if(check_friendship_history.StatusCode === StatusFriend.Blocked || check_friendship_history.SpecifierId){
+                        await sequelize.transaction(async (t) => {
+                            try{
+                                await db.HistoryFriendShip.destroy({
+                                    where: {
+                                        [Op.or]: [
+                                            { RequesterId: parseInt(id,10) },
+                                            { AddresseeId: parseInt(id,10) },
+                                        ],
+                                    },
+                                    transaction: t,
+                                });
+                                await db.Friendship.destroy({
+                                    where: {
+                                        [Op.or]: [
+                                            { RequesterId: parseInt(id,10) },
+                                            { AddresseeId: parseInt(id,10) },
+                                        ],
+                                    },
+                                    transaction: t,
+                                });
+                            } catch (error) {
+                                await t.rollback();
+                                throw new MySQLError(
+                                    `Lỗi bất thường khi thao tác trong cơ sở dữ liệu: ${error}`
+                                );
+                            }
+                        });
                 }
             }else{
-                await db.HistoryFriendShip.create({
-                    RequesterId: user.id,
-                    AddresseeId : user_block.id,
-                    StatusCode : StatusFriend.Blocked,
-                    SpecifierId : user.id
-                });
+                throw new Error('ban chua block nguoi nay');
             }
             return ISuccessResponse.Success;
         }
     },
 };
-
 export default userResolver;

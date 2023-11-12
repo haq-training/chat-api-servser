@@ -65,8 +65,12 @@ export const variables = {
         id : 3,
     },
     block_user: {
-        id : 3,
+        id : 7,
     },
+    unblock_user: {
+        id : 7,
+    },
+
 
 
 

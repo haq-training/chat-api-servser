@@ -15,5 +15,5 @@ export enum StatusFriend {
     Requested = 'R',
     Accepted = 'A',
     Declined = 'D',
-     Blocked = 'B',
+    Blocked = 'B',
 }

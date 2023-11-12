@@ -127,7 +127,7 @@ export type IPaginationInput = {
 
 export type IQuery = {
     __typename?: 'Query';
-    listFriend?: Maybe<Array<Maybe<IList_Friend>>>;
+    listFriend?: Maybe<IList_All_Friend>;
     login: IUserLoginResponse;
     me: IUser;
     user: IUser;
@@ -197,6 +197,12 @@ export type IList_Friend = {
     location?: Maybe<Scalars['String']['output']>;
     status?: Maybe<Scalars['Boolean']['output']>;
     story?: Maybe<Scalars['String']['output']>;
+};
+
+export type IList_All_Friend = {
+    __typename?: 'list_all_friend';
+    block?: Maybe<Array<Maybe<IList_Friend>>>;
+    friend?: Maybe<Array<Maybe<IList_Friend>>>;
 };
 
 export type ResolverTypeWrapper<T> = Promise<T> | T;
@@ -329,6 +335,7 @@ export type IResolversTypes = {
     >;
     changePasswordInput: IChangePasswordInput;
     list_Friend: ResolverTypeWrapper<IList_Friend>;
+    list_all_friend: ResolverTypeWrapper<IList_All_Friend>;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -355,6 +362,7 @@ export type IResolversParentTypes = {
     };
     changePasswordInput: IChangePasswordInput;
     list_Friend: IList_Friend;
+    list_all_friend: IList_All_Friend;
 };
 
 export interface ICursorScalarConfig
@@ -456,7 +464,7 @@ export type IQueryResolvers<
     ParentType extends IResolversParentTypes['Query'] = IResolversParentTypes['Query']
 > = {
     listFriend?: Resolver<
-        Maybe<Array<Maybe<IResolversTypes['list_Friend']>>>,
+        Maybe<IResolversTypes['list_all_friend']>,
         ParentType,
         ContextType
     >;
@@ -559,6 +567,23 @@ export type IList_FriendResolvers<
     __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type IList_All_FriendResolvers<
+    ContextType = any,
+    ParentType extends IResolversParentTypes['list_all_friend'] = IResolversParentTypes['list_all_friend']
+> = {
+    block?: Resolver<
+        Maybe<Array<Maybe<IResolversTypes['list_Friend']>>>,
+        ParentType,
+        ContextType
+    >;
+    friend?: Resolver<
+        Maybe<Array<Maybe<IResolversTypes['list_Friend']>>>,
+        ParentType,
+        ContextType
+    >;
+    __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type IResolvers<ContextType = any> = {
     Cursor?: GraphQLScalarType;
     Date?: GraphQLScalarType;
@@ -570,4 +595,5 @@ export type IResolvers<ContextType = any> = {
     User?: IUserResolvers<ContextType>;
     UserLoginResponse?: IUserLoginResponseResolvers<ContextType>;
     list_Friend?: IList_FriendResolvers<ContextType>;
+    list_all_friend?: IList_All_FriendResolvers<ContextType>;
 };

@@ -24,7 +24,7 @@ type PageInfo {
 }
 
 type Query {
-    listFriend: [list_Friend]
+    listFriend: list_all_friend
     login(input: UserLoginInput!): UserLoginResponse!
     me: User!
     user(id: ID!): User!
@@ -59,6 +59,11 @@ type list_Friend {
     location: String
     status: Boolean
     story: String
+}
+
+type list_all_friend {
+    block: [list_Friend]
+    friend: [list_Friend]
 }
 
 enum SuccessResponse {

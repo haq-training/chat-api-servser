@@ -1,7 +1,7 @@
-[{"id":1, "RequesterId":1, "AddresseeId":3, "SpecifiedDateTime":"2023-08-25 09:09:59", "StatusCode":"R", "SpecifierId":1},
- {"id":2, "RequesterId":1, "AddresseeId":3, "SpecifiedDateTime":"2023-08-25 10:09:59", "StatusCode":"A", "SpecifierId":3},
- {"id":3, "RequesterId":1, "AddresseeId":3, "SpecifiedDateTime":"2023-08-28 09:09:59", "StatusCode":"B", "SpecifierId":3},
- {"id":4, "RequesterId":1, "AddresseeId":5, "SpecifiedDateTime":"2023-08-25 10:09:59", "StatusCode":"R", "SpecifierId":1},
- {"id":5, "RequesterId":1, "AddresseeId":5, "SpecifiedDateTime":"2023-08-25 11:09:59", "StatusCode":"A", "SpecifierId":5},
- {"id":6, "RequesterId":1, "AddresseeId":7, "SpecifiedDateTime":"2023-08-25 09:09:59", "StatusCode":"A", "SpecifierId":7}
+[{"Id":1,"FriendshipID":1,"RequesterId":1, "AddresseeId":3, "SpecifiedDateTime":"2023-08-25 09:09:59", "StatusCode":"R", "SpecifierId":1},
+ {"Id":2,"FriendshipID":1,"RequesterId":1, "AddresseeId":3, "SpecifiedDateTime":"2023-08-25 10:09:59", "StatusCode":"A", "SpecifierId":3},
+ {"Id":3,"FriendshipID":1,"RequesterId":1, "AddresseeId":3, "SpecifiedDateTime":"2023-08-28 09:09:59", "StatusCode":"B", "SpecifierId":3},
+ {"Id":4,"FriendshipID":2,"RequesterId":1, "AddresseeId":5, "SpecifiedDateTime":"2023-08-25 10:09:59", "StatusCode":"R", "SpecifierId":1},
+ {"Id":5,"FriendshipID":2,"RequesterId":1, "AddresseeId":5, "SpecifiedDateTime":"2023-08-25 11:09:59", "StatusCode":"A", "SpecifierId":5},
+ {"Id":6,"FriendshipID":3,"RequesterId":1, "AddresseeId":7, "SpecifiedDateTime":"2023-08-25 09:09:59", "StatusCode":"A", "SpecifierId":7}
 ]

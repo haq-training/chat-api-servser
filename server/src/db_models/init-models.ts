@@ -44,20 +44,14 @@ export function initModels(sequelize: Sequelize) {
   const file = _file.initModel(sequelize);
   const users = _users.initModel(sequelize);
 
-  Friendship.belongsToMany(Friendship, { as: 'AddresseeId_Friendships', through: HistoryFriendShip, foreignKey: 'RequesterId', otherKey: 'AddresseeId' });
-  Friendship.belongsToMany(Friendship, { as: 'RequesterId_Friendships', through: HistoryFriendShip, foreignKey: 'AddresseeId', otherKey: 'RequesterId' });
-  users.belongsToMany(users, { as: 'AddresseeId_users', through: Friendship, foreignKey: 'RequesterId', otherKey: 'AddresseeId' });
-  users.belongsToMany(users, { as: 'RequesterId_users', through: Friendship, foreignKey: 'AddresseeId', otherKey: 'RequesterId' });
-  HistoryFriendShip.belongsTo(Friendship, { as: 'Requester', foreignKey: 'RequesterId'});
-  Friendship.hasMany(HistoryFriendShip, { as: 'HistoryFriendShips', foreignKey: 'RequesterId'});
-  HistoryFriendShip.belongsTo(Friendship, { as: 'Addressee', foreignKey: 'AddresseeId'});
-  Friendship.hasMany(HistoryFriendShip, { as: 'Addressee_HistoryFriendShips', foreignKey: 'AddresseeId'});
+  HistoryFriendShip.belongsTo(Friendship, { as: 'Friendship', foreignKey: 'FriendshipID'});
+  Friendship.hasMany(HistoryFriendShip, { as: 'HistoryFriendShips', foreignKey: 'FriendshipID'});
   chat_members.belongsTo(chat_room, { as: 'chatRoom', foreignKey: 'chatRoomId'});
   chat_room.hasMany(chat_members, { as: 'chat_members', foreignKey: 'chatRoomId'});
-  Friendship.belongsTo(users, { as: 'Requester', foreignKey: 'RequesterId'});
-  users.hasMany(Friendship, { as: 'Friendships', foreignKey: 'RequesterId'});
   Friendship.belongsTo(users, { as: 'Addressee', foreignKey: 'AddresseeId'});
-  users.hasMany(Friendship, { as: 'Addressee_Friendships', foreignKey: 'AddresseeId'});
+  users.hasMany(Friendship, { as: 'Friendships', foreignKey: 'AddresseeId'});
+  Friendship.belongsTo(users, { as: 'Requester', foreignKey: 'RequesterId'});
+  users.hasMany(Friendship, { as: 'Requester_Friendships', foreignKey: 'RequesterId'});
   HistoryFriendShip.belongsTo(users, { as: 'Specifier', foreignKey: 'SpecifierId'});
   users.hasMany(HistoryFriendShip, { as: 'HistoryFriendShips', foreignKey: 'SpecifierId'});
   chat_members.belongsTo(users, { as: 'user', foreignKey: 'userId'});

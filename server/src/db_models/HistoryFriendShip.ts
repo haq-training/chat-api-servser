@@ -1,9 +1,11 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model, Optional } from 'sequelize';
-import { Friendship, FriendshipId } from './Friendship';
+import type { Friendship, FriendshipId } from './Friendship';
 import type { users, usersId } from './users';
 
 export interface HistoryFriendShipAttributes {
+  Id: number;
+  FriendshipID: number;
   RequesterId: number;
   AddresseeId: number;
   SpecifiedDateTime: Date;
@@ -11,13 +13,16 @@ export interface HistoryFriendShipAttributes {
   SpecifierId: number;
 }
 
-export type HistoryFriendShipPk = 'RequesterId' | 'AddresseeId' | 'SpecifiedDateTime';
+export type HistoryFriendShipPk = 'Id';
 export type HistoryFriendShipId = HistoryFriendShip[HistoryFriendShipPk];
-export type HistoryFriendShipOptionalAttributes = 'SpecifiedDateTime';
+export type HistoryFriendShipOptionalAttributes = 'Id' | 'SpecifiedDateTime';
 export type HistoryFriendShipCreationAttributes = Optional<HistoryFriendShipAttributes, HistoryFriendShipOptionalAttributes>;
 
-export class HistoryFriendShip extends
-    Model<HistoryFriendShipAttributes, HistoryFriendShipCreationAttributes> implements HistoryFriendShipAttributes {
+export class HistoryFriendShip extends Model<HistoryFriendShipAttributes, HistoryFriendShipCreationAttributes> implements HistoryFriendShipAttributes {
+  Id!: number;
+
+  FriendshipID!: number;
+
   RequesterId!: number;
 
   AddresseeId!: number;
@@ -28,23 +33,14 @@ export class HistoryFriendShip extends
 
   SpecifierId!: number;
 
-  // HistoryFriendShip belongsTo Friendship via RequesterId
-  Requester!: Friendship;
+  // HistoryFriendShip belongsTo Friendship via FriendshipID
+  Friendship!: Friendship;
 
-  getRequester!: Sequelize.BelongsToGetAssociationMixin<Friendship>;
+  getFriendship!: Sequelize.BelongsToGetAssociationMixin<Friendship>;
 
-  setRequester!: Sequelize.BelongsToSetAssociationMixin<Friendship, FriendshipId>;
+  setFriendship!: Sequelize.BelongsToSetAssociationMixin<Friendship, FriendshipId>;
 
-  createRequester!: Sequelize.BelongsToCreateAssociationMixin<Friendship>;
-
-  // HistoryFriendShip belongsTo Friendship via AddresseeId
-  Addressee!: Friendship;
-
-  getAddressee!: Sequelize.BelongsToGetAssociationMixin<Friendship>;
-
-  setAddressee!: Sequelize.BelongsToSetAssociationMixin<Friendship, FriendshipId>;
-
-  createAddressee!: Sequelize.BelongsToCreateAssociationMixin<Friendship>;
+  createFriendship!: Sequelize.BelongsToCreateAssociationMixin<Friendship>;
 
   // HistoryFriendShip belongsTo users via SpecifierId
   Specifier!: users;
@@ -56,30 +52,33 @@ export class HistoryFriendShip extends
   createSpecifier!: Sequelize.BelongsToCreateAssociationMixin<users>;
 
   static initModel(sequelize: Sequelize.Sequelize): typeof HistoryFriendShip {
-    HistoryFriendShip.init({
-    RequesterId: {
+    return HistoryFriendShip.init({
+    Id: {
+      autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
-      primaryKey: true,
+      primaryKey: true
+    },
+    FriendshipID: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
       references: {
         model: 'Friendship',
-        key: 'RequesterId'
+        key: 'Id'
       }
+    },
+    RequesterId: {
+      type: DataTypes.INTEGER,
+      allowNull: false
     },
     AddresseeId: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true,
-      references: {
-        model: 'Friendship',
-        key: 'AddresseeId'
-      }
+      allowNull: false
     },
     SpecifiedDateTime: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: Sequelize.Sequelize.literal('CURRENT_TIMESTAMP'),
-      primaryKey: true
+      defaultValue: Sequelize.Sequelize.literal('CURRENT_TIMESTAMP')
     },
     StatusCode: {
       type: DataTypes.CHAR(1),
@@ -103,18 +102,16 @@ export class HistoryFriendShip extends
         unique: true,
         using: 'BTREE',
         fields: [
-          { name: 'RequesterId' },
-          { name: 'AddresseeId' },
-          { name: 'SpecifiedDateTime' },
+          { name: 'Id' },
         ]
       },
       {
-        name: 'HistoryFriendShip_AddresseeId_RequesterId_unique',
+        name: 'Friendship_Unique',
         unique: true,
         using: 'BTREE',
         fields: [
-          { name: 'RequesterId' },
-          { name: 'AddresseeId' },
+          { name: 'FriendshipID' },
+          { name: 'SpecifiedDateTime' },
         ]
       },
       {
@@ -124,22 +121,7 @@ export class HistoryFriendShip extends
           { name: 'SpecifierId' },
         ]
       },
-      {
-        name: 'HistoryFriendShip_ibfk_2_idx',
-        using: 'BTREE',
-        fields: [
-          { name: 'AddresseeId' },
-        ]
-      },
     ]
   });
-    // HistoryFriendShip.belongsTo(Friendship, {
-    //   foreignKey: {
-    //     name: 'HistoryFriendShipToFriendship_FK',
-    //     field: ['RequesterId', 'AddresseeId'],
-    //   },
-    //   as: 'HistoryFriendShip',
-    // });
-    return HistoryFriendShip;
   }
 }

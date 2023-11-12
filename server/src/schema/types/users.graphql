@@ -3,7 +3,7 @@ extend type Query {
     user(id:ID!): User!
     login(input: UserLoginInput!): UserLoginResponse!
     me:User!
-    listFriend : [list_Friend]
+    listFriend : list_all_friend
 }
 
 extend type Mutation {
@@ -31,6 +31,10 @@ type User {
     role: Int!
     createdAt: Date
     updatedAt: Date
+}
+type list_all_friend {
+    friend : [list_Friend]
+    block  : [list_Friend]
 }
 type list_Friend {
     id: Int!

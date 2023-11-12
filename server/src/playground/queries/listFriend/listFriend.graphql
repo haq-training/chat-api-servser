@@ -1,12 +1,24 @@
-query Query {
-    listFriend{
-        id
-        email
-        firstName
-        lastName
-        status
-        story
-        location
-        avatarUrl
+query {
+    listFriend {
+        friend {
+            id
+            email
+            firstName
+            lastName
+            avatarUrl
+            status
+            location
+            story
+        }
+        block {
+            id
+            email
+            firstName
+            lastName
+            avatarUrl
+            status
+            location
+            story
+        }
     }
 }

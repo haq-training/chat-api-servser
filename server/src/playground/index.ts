@@ -48,6 +48,7 @@ const delete_user = importGraphqlString('./mutations/delete/delete.graphql');
 const addFriend = importGraphqlString('./mutations/addFriend/addFriend.graphql');
 const unFriend = importGraphqlString('./mutations/unFriend/unFriend.graphql');
 const block_user = importGraphqlString('./mutations/block_user/block_user.graphql');
+const unblock_user = importGraphqlString('./mutations/unblock_user/unblock_user.graphql');
 
 export const queryExample = async (
     path: string = defaultPath
@@ -148,6 +149,13 @@ export const queryExample = async (
             name: 'block',
             query: block_user,
             variables: prettifyJsonString(variables.block_user),
+            headers: userAuth,
+        },
+        {
+            endpoint: path,
+            name: 'unblock',
+            query: unblock_user,
+            variables: prettifyJsonString(variables.unblock_user),
             headers: userAuth,
         },
     ];

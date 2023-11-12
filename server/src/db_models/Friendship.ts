@@ -4,18 +4,21 @@ import type { HistoryFriendShip, HistoryFriendShipId } from './HistoryFriendShip
 import type { users, usersId } from './users';
 
 export interface FriendshipAttributes {
+  Id: number;
   RequesterId: number;
   AddresseeId: number;
   StatusCode: string;
   CreatedDateTime: Date;
 }
 
-export type FriendshipPk = 'RequesterId' | 'AddresseeId' | 'StatusCode';
+export type FriendshipPk = 'Id';
 export type FriendshipId = Friendship[FriendshipPk];
-export type FriendshipOptionalAttributes = 'CreatedDateTime';
+export type FriendshipOptionalAttributes = 'Id' | 'CreatedDateTime';
 export type FriendshipCreationAttributes = Optional<FriendshipAttributes, FriendshipOptionalAttributes>;
 
 export class Friendship extends Model<FriendshipAttributes, FriendshipCreationAttributes> implements FriendshipAttributes {
+  Id!: number;
+
   RequesterId!: number;
 
   AddresseeId!: number;
@@ -24,53 +27,7 @@ export class Friendship extends Model<FriendshipAttributes, FriendshipCreationAt
 
   CreatedDateTime!: Date;
 
-  // Friendship belongsToMany Friendship via RequesterId and AddresseeId
-  AddresseeId_Friendships!: Friendship[];
-
-  getAddresseeId_Friendships!: Sequelize.BelongsToManyGetAssociationsMixin<Friendship>;
-
-  setAddresseeId_Friendships!: Sequelize.BelongsToManySetAssociationsMixin<Friendship, FriendshipId>;
-
-  addAddresseeId_Friendship!: Sequelize.BelongsToManyAddAssociationMixin<Friendship, FriendshipId>;
-
-  addAddresseeId_Friendships!: Sequelize.BelongsToManyAddAssociationsMixin<Friendship, FriendshipId>;
-
-  createAddresseeId_Friendship!: Sequelize.BelongsToManyCreateAssociationMixin<Friendship>;
-
-  removeAddresseeId_Friendship!: Sequelize.BelongsToManyRemoveAssociationMixin<Friendship, FriendshipId>;
-
-  removeAddresseeId_Friendships!: Sequelize.BelongsToManyRemoveAssociationsMixin<Friendship, FriendshipId>;
-
-  hasAddresseeId_Friendship!: Sequelize.BelongsToManyHasAssociationMixin<Friendship, FriendshipId>;
-
-  hasAddresseeId_Friendships!: Sequelize.BelongsToManyHasAssociationsMixin<Friendship, FriendshipId>;
-
-  countAddresseeId_Friendships!: Sequelize.BelongsToManyCountAssociationsMixin;
-
-  // Friendship belongsToMany Friendship via AddresseeId and RequesterId
-  RequesterId_Friendships!: Friendship[];
-
-  getRequesterId_Friendships!: Sequelize.BelongsToManyGetAssociationsMixin<Friendship>;
-
-  setRequesterId_Friendships!: Sequelize.BelongsToManySetAssociationsMixin<Friendship, FriendshipId>;
-
-  addRequesterId_Friendship!: Sequelize.BelongsToManyAddAssociationMixin<Friendship, FriendshipId>;
-
-  addRequesterId_Friendships!: Sequelize.BelongsToManyAddAssociationsMixin<Friendship, FriendshipId>;
-
-  createRequesterId_Friendship!: Sequelize.BelongsToManyCreateAssociationMixin<Friendship>;
-
-  removeRequesterId_Friendship!: Sequelize.BelongsToManyRemoveAssociationMixin<Friendship, FriendshipId>;
-
-  removeRequesterId_Friendships!: Sequelize.BelongsToManyRemoveAssociationsMixin<Friendship, FriendshipId>;
-
-  hasRequesterId_Friendship!: Sequelize.BelongsToManyHasAssociationMixin<Friendship, FriendshipId>;
-
-  hasRequesterId_Friendships!: Sequelize.BelongsToManyHasAssociationsMixin<Friendship, FriendshipId>;
-
-  countRequesterId_Friendships!: Sequelize.BelongsToManyCountAssociationsMixin;
-
-  // Friendship hasMany HistoryFriendShip via RequesterId
+  // Friendship hasMany HistoryFriendShip via FriendshipID
   HistoryFriendShips!: HistoryFriendShip[];
 
   getHistoryFriendShips!: Sequelize.HasManyGetAssociationsMixin<HistoryFriendShip>;
@@ -93,28 +50,14 @@ export class Friendship extends Model<FriendshipAttributes, FriendshipCreationAt
 
   countHistoryFriendShips!: Sequelize.HasManyCountAssociationsMixin;
 
-  // Friendship hasMany HistoryFriendShip via AddresseeId
-  Addressee_HistoryFriendShips!: HistoryFriendShip[];
+  // Friendship belongsTo users via AddresseeId
+  Addressee!: users;
 
-  getAddressee_HistoryFriendShips!: Sequelize.HasManyGetAssociationsMixin<HistoryFriendShip>;
+  getAddressee!: Sequelize.BelongsToGetAssociationMixin<users>;
 
-  setAddressee_HistoryFriendShips!: Sequelize.HasManySetAssociationsMixin<HistoryFriendShip, HistoryFriendShipId>;
+  setAddressee!: Sequelize.BelongsToSetAssociationMixin<users, usersId>;
 
-  addAddressee_HistoryFriendShip!: Sequelize.HasManyAddAssociationMixin<HistoryFriendShip, HistoryFriendShipId>;
-
-  addAddressee_HistoryFriendShips!: Sequelize.HasManyAddAssociationsMixin<HistoryFriendShip, HistoryFriendShipId>;
-
-  createAddressee_HistoryFriendShip!: Sequelize.HasManyCreateAssociationMixin<HistoryFriendShip>;
-
-  removeAddressee_HistoryFriendShip!: Sequelize.HasManyRemoveAssociationMixin<HistoryFriendShip, HistoryFriendShipId>;
-
-  removeAddressee_HistoryFriendShips!: Sequelize.HasManyRemoveAssociationsMixin<HistoryFriendShip, HistoryFriendShipId>;
-
-  hasAddressee_HistoryFriendShip!: Sequelize.HasManyHasAssociationMixin<HistoryFriendShip, HistoryFriendShipId>;
-
-  hasAddressee_HistoryFriendShips!: Sequelize.HasManyHasAssociationsMixin<HistoryFriendShip, HistoryFriendShipId>;
-
-  countAddressee_HistoryFriendShips!: Sequelize.HasManyCountAssociationsMixin;
+  createAddressee!: Sequelize.BelongsToCreateAssociationMixin<users>;
 
   // Friendship belongsTo users via RequesterId
   Requester!: users;
@@ -125,21 +68,17 @@ export class Friendship extends Model<FriendshipAttributes, FriendshipCreationAt
 
   createRequester!: Sequelize.BelongsToCreateAssociationMixin<users>;
 
-  // Friendship belongsTo users via AddresseeId
-  Addressee!: users;
-
-  getAddressee!: Sequelize.BelongsToGetAssociationMixin<users>;
-
-  setAddressee!: Sequelize.BelongsToSetAssociationMixin<users, usersId>;
-
-  createAddressee!: Sequelize.BelongsToCreateAssociationMixin<users>;
-
   static initModel(sequelize: Sequelize.Sequelize): typeof Friendship {
     return Friendship.init({
+    Id: {
+      autoIncrement: true,
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true
+    },
     RequesterId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      primaryKey: true,
       references: {
         model: 'users',
         key: 'id'
@@ -148,7 +87,6 @@ export class Friendship extends Model<FriendshipAttributes, FriendshipCreationAt
     AddresseeId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      primaryKey: true,
       references: {
         model: 'users',
         key: 'id'
@@ -156,8 +94,7 @@ export class Friendship extends Model<FriendshipAttributes, FriendshipCreationAt
     },
     StatusCode: {
       type: DataTypes.CHAR(1),
-      allowNull: false,
-      primaryKey: true
+      allowNull: false
     },
     CreatedDateTime: {
       type: DataTypes.DATE,
@@ -174,25 +111,23 @@ export class Friendship extends Model<FriendshipAttributes, FriendshipCreationAt
         unique: true,
         using: 'BTREE',
         fields: [
-          { name: 'RequesterId' },
-          { name: 'AddresseeId' },
-          { name: 'StatusCode' },
+          { name: 'Id' },
         ]
       },
       {
-        name: 'Friendship_AddresseeId_RequesterId_unique',
+        name: 'Friendship_Unique',
         unique: true,
         using: 'BTREE',
         fields: [
-          { name: 'RequesterId' },
           { name: 'AddresseeId' },
+          { name: 'RequesterId' },
         ]
       },
       {
-        name: 'FriendshipToAddressee_FK',
+        name: 'FriendshipToRequester_FK',
         using: 'BTREE',
         fields: [
-          { name: 'AddresseeId' },
+          { name: 'RequesterId' },
         ]
       },
     ]

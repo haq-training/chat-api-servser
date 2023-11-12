@@ -53,7 +53,7 @@ export class users extends Model<usersAttributes, usersCreationAttributes> imple
 
   updatedAt!: Date;
 
-  // users hasMany Friendship via RequesterId
+  // users hasMany Friendship via AddresseeId
   Friendships!: Friendship[];
 
   getFriendships!: Sequelize.HasManyGetAssociationsMixin<Friendship>;
@@ -76,28 +76,28 @@ export class users extends Model<usersAttributes, usersCreationAttributes> imple
 
   countFriendships!: Sequelize.HasManyCountAssociationsMixin;
 
-  // users hasMany Friendship via AddresseeId
-  Addressee_Friendships!: Friendship[];
+  // users hasMany Friendship via RequesterId
+  Requester_Friendships!: Friendship[];
 
-  getAddressee_Friendships!: Sequelize.HasManyGetAssociationsMixin<Friendship>;
+  getRequester_Friendships!: Sequelize.HasManyGetAssociationsMixin<Friendship>;
 
-  setAddressee_Friendships!: Sequelize.HasManySetAssociationsMixin<Friendship, FriendshipId>;
+  setRequester_Friendships!: Sequelize.HasManySetAssociationsMixin<Friendship, FriendshipId>;
 
-  addAddressee_Friendship!: Sequelize.HasManyAddAssociationMixin<Friendship, FriendshipId>;
+  addRequester_Friendship!: Sequelize.HasManyAddAssociationMixin<Friendship, FriendshipId>;
 
-  addAddressee_Friendships!: Sequelize.HasManyAddAssociationsMixin<Friendship, FriendshipId>;
+  addRequester_Friendships!: Sequelize.HasManyAddAssociationsMixin<Friendship, FriendshipId>;
 
-  createAddressee_Friendship!: Sequelize.HasManyCreateAssociationMixin<Friendship>;
+  createRequester_Friendship!: Sequelize.HasManyCreateAssociationMixin<Friendship>;
 
-  removeAddressee_Friendship!: Sequelize.HasManyRemoveAssociationMixin<Friendship, FriendshipId>;
+  removeRequester_Friendship!: Sequelize.HasManyRemoveAssociationMixin<Friendship, FriendshipId>;
 
-  removeAddressee_Friendships!: Sequelize.HasManyRemoveAssociationsMixin<Friendship, FriendshipId>;
+  removeRequester_Friendships!: Sequelize.HasManyRemoveAssociationsMixin<Friendship, FriendshipId>;
 
-  hasAddressee_Friendship!: Sequelize.HasManyHasAssociationMixin<Friendship, FriendshipId>;
+  hasRequester_Friendship!: Sequelize.HasManyHasAssociationMixin<Friendship, FriendshipId>;
 
-  hasAddressee_Friendships!: Sequelize.HasManyHasAssociationsMixin<Friendship, FriendshipId>;
+  hasRequester_Friendships!: Sequelize.HasManyHasAssociationsMixin<Friendship, FriendshipId>;
 
-  countAddressee_Friendships!: Sequelize.HasManyCountAssociationsMixin;
+  countRequester_Friendships!: Sequelize.HasManyCountAssociationsMixin;
 
   // users hasMany HistoryFriendShip via SpecifierId
   HistoryFriendShips!: HistoryFriendShip[];
@@ -167,52 +167,6 @@ export class users extends Model<usersAttributes, usersCreationAttributes> imple
   hasFiles!: Sequelize.HasManyHasAssociationsMixin<file, fileId>;
 
   countFiles!: Sequelize.HasManyCountAssociationsMixin;
-
-  // users belongsToMany users via RequesterId and AddresseeId
-  AddresseeId_users!: users[];
-
-  getAddresseeId_users!: Sequelize.BelongsToManyGetAssociationsMixin<users>;
-
-  setAddresseeId_users!: Sequelize.BelongsToManySetAssociationsMixin<users, usersId>;
-
-  addAddresseeId_user!: Sequelize.BelongsToManyAddAssociationMixin<users, usersId>;
-
-  addAddresseeId_users!: Sequelize.BelongsToManyAddAssociationsMixin<users, usersId>;
-
-  createAddresseeId_user!: Sequelize.BelongsToManyCreateAssociationMixin<users>;
-
-  removeAddresseeId_user!: Sequelize.BelongsToManyRemoveAssociationMixin<users, usersId>;
-
-  removeAddresseeId_users!: Sequelize.BelongsToManyRemoveAssociationsMixin<users, usersId>;
-
-  hasAddresseeId_user!: Sequelize.BelongsToManyHasAssociationMixin<users, usersId>;
-
-  hasAddresseeId_users!: Sequelize.BelongsToManyHasAssociationsMixin<users, usersId>;
-
-  countAddresseeId_users!: Sequelize.BelongsToManyCountAssociationsMixin;
-
-  // users belongsToMany users via AddresseeId and RequesterId
-  RequesterId_users!: users[];
-
-  getRequesterId_users!: Sequelize.BelongsToManyGetAssociationsMixin<users>;
-
-  setRequesterId_users!: Sequelize.BelongsToManySetAssociationsMixin<users, usersId>;
-
-  addRequesterId_user!: Sequelize.BelongsToManyAddAssociationMixin<users, usersId>;
-
-  addRequesterId_users!: Sequelize.BelongsToManyAddAssociationsMixin<users, usersId>;
-
-  createRequesterId_user!: Sequelize.BelongsToManyCreateAssociationMixin<users>;
-
-  removeRequesterId_user!: Sequelize.BelongsToManyRemoveAssociationMixin<users, usersId>;
-
-  removeRequesterId_users!: Sequelize.BelongsToManyRemoveAssociationsMixin<users, usersId>;
-
-  hasRequesterId_user!: Sequelize.BelongsToManyHasAssociationMixin<users, usersId>;
-
-  hasRequesterId_users!: Sequelize.BelongsToManyHasAssociationsMixin<users, usersId>;
-
-  countRequesterId_users!: Sequelize.BelongsToManyCountAssociationsMixin;
 
   static initModel(sequelize: Sequelize.Sequelize): typeof users {
     return users.init({

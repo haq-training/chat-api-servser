@@ -32,8 +32,8 @@ export const syncDatabase = async () => {
             .then(async () => {
                 if (isForceSync) {
                     await models.users.bulkCreate(users as any);
-                    // await models.Friendship.bulkCreate(friendship as any);
-                    // await models.HistoryFriendShip.bulkCreate(HistoryFriendShip as any);
+                    await models.Friendship.bulkCreate(friendship as any);
+                    await models.HistoryFriendShip.bulkCreate(HistoryFriendShip as any);
                 }
             })
             .catch((err) => {

@@ -18,7 +18,8 @@ export type HistoryFriendShipId = HistoryFriendShip[HistoryFriendShipPk];
 export type HistoryFriendShipOptionalAttributes = 'Id' | 'SpecifiedDateTime';
 export type HistoryFriendShipCreationAttributes = Optional<HistoryFriendShipAttributes, HistoryFriendShipOptionalAttributes>;
 
-export class HistoryFriendShip extends Model<HistoryFriendShipAttributes, HistoryFriendShipCreationAttributes> implements HistoryFriendShipAttributes {
+export
+class HistoryFriendShip extends Model<HistoryFriendShipAttributes, HistoryFriendShipCreationAttributes> implements HistoryFriendShipAttributes {
   Id!: number;
 
   FriendshipID!: number;

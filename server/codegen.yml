@@ -10,3 +10,6 @@ generates:
     config:
       mappers:
         User: ../db_models/init-models#users
+        ChatRoom: ../db_models/init-models#chat_room
+        ChatMember: ../db_models/init-models#chat_members
+        file : ../db_models/init-models#file

@@ -84,3 +84,91 @@ export class InvalidPaginationArgumentError extends GraphQLError {
         });
     }
 }
+export enum ErrorCode {
+    /**
+     * Invalid access token passed
+     */
+    Unauthenticated = 'Unauthenticated',
+    /**
+     * Invalid pagination argument specified
+     */
+    InvalidPaginationArgument = 'InvalidPaginationArgument',
+    /**
+     * Unexpected error MySQL
+     */
+    MySQL = 'MySQL',
+    /**
+     * Unexpected error MinIO
+     */
+    MinIO = 'MinIO',
+    /**
+     * RoleNotFound.
+     */
+    RoleNotFound = 'RoleNotFound',
+    /**
+     * User not found.
+     */
+    UserNotFound = 'UserNotFound',
+    /**
+     * User already exist.
+     */
+    UserAlreadyExist = 'UserAlreadyExist',
+    /**
+     * ProductCodeDuplicatedError
+     */
+    ProductCodeDuplicated = 'ProductCodeDuplicated',
+    /**
+     * User not mapping with token.
+     */
+    InvalidUserRequest = 'InvalidUserRequest',
+    /**
+     * InvalidStatus.
+     */
+    InvalidStatus = 'InvalidStatus',
+    /**
+     * TaskNotFound.
+     */
+    TaskNotFound = 'TaskNotFound',
+    /**
+     * TaskNotAllowUpdateError.
+     */
+    TaskNotAllowUpdate = 'TaskNotAllowUpdate',
+    /**
+     * TaskNotAllowUpdateError.
+     */
+    TaskNotAllowCreate = 'TaskNotAllowCreate',
+    /**
+     * NotificationNotFoundError.
+     */
+    NotificationNotFound = 'NotificationNotFound',
+    /**
+     * RecordNotFoundError
+     */
+    RecordNotFound = 'RecordNotFound',
+    /**
+     * ChatRoomNotFound.
+     */
+    ChatRoomNotFound = 'ChatRoomNotFound',
+    /**
+     * ChatRoomClosed.
+     */
+    ChatRoomClosed = 'ChatRoomClosed',
+    /**
+     * ChatMemberNotFound.
+     */
+    ChatMemberNotFound = 'ChatMemberNotFound',
+    /**
+     * ChatMessageNotFound.
+     */
+    ChatMessageNotFound = 'ChatMessageNotFound',
+    /**
+     * ChatRoomNotAllowCreateError.
+     */
+    ChatRoomNotAllowCreate = 'ChatRoomNotAllowCreate',
+    /**
+     * AddChatMemberNotAllowCreateError.
+     */
+    AddChatMemberNotAllowCreate = 'AddChatMemberNotAllowCreate',
+}
+
+//

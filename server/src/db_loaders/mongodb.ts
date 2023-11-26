@@ -19,7 +19,7 @@ export const mongoLoader = async () => {
         .then(async () => {
             if (process.env.NODE_ENV === 'development') {
                 for (const element of chatMessageData) {
-                    await chatMessage.findOneAndUpdate(
+                     chatMessage.findOneAndUpdate(
                         { _id: element._id },
                         element,
                         {

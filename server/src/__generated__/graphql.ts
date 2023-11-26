@@ -3,7 +3,7 @@ import {
     GraphQLScalarType,
     GraphQLScalarTypeConfig,
 } from 'graphql';
-import { users } from '../db_models/init-models';
+import { users, chat_room, chat_members, file } from '../db_models/init-models';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = {
@@ -43,6 +43,99 @@ export type Scalars = {
     Upload: { input: any; output: any };
 };
 
+export type IAddChatMemberInput = {
+    members: Array<IChatMemberInput>;
+    roomId: Scalars['Int']['input'];
+};
+
+export type IChatMember = {
+    __typename?: 'ChatMember';
+    is_admin: Scalars['Boolean']['output'];
+    user: IUser;
+};
+
+export type IChatMemberInput = {
+    isAdmin?: InputMaybe<Scalars['Boolean']['input']>;
+    userId: Scalars['Int']['input'];
+};
+
+export type IChatMessage = {
+    __typename?: 'ChatMessage';
+    content: Scalars['String']['output'];
+    id: Scalars['ID']['output'];
+    messageContentType?: Maybe<IMessageContentType>;
+    posted_at: Scalars['Date']['output'];
+    posted_by: IUser;
+    /**
+     * Return number of read by another user for message send by own.
+     * Return null if posted by another user.
+     */
+    read_count?: Maybe<Scalars['Int']['output']>;
+    room_id: Scalars['Int']['output'];
+};
+
+export type IChatMessageConnection = {
+    __typename?: 'ChatMessageConnection';
+    edges?: Maybe<Array<Maybe<IChatMessageEdge>>>;
+    pageInfo: IPageInfo;
+    totalCount: Scalars['Int']['output'];
+};
+
+export type IChatMessageEdge = {
+    __typename?: 'ChatMessageEdge';
+    cursor: Scalars['String']['output'];
+    node?: Maybe<IChatMessage>;
+};
+
+export type IChatRoom = {
+    __typename?: 'ChatRoom';
+    id: Scalars['Int']['output'];
+    members: Array<IChatMember>;
+    messages: IChatMessageConnection;
+    name?: Maybe<Scalars['String']['output']>;
+    type: IChatRoomType;
+    unread_count?: Maybe<Scalars['Int']['output']>;
+};
+
+export type IChatRoomMessagesArgs = {
+    input?: InputMaybe<IPaginationInput>;
+};
+
+export type IChatRoomConnection = {
+    __typename?: 'ChatRoomConnection';
+    edges?: Maybe<Array<Maybe<IChatRoomEdge>>>;
+    pageInfo: IPageInfo;
+    totalCount: Scalars['Int']['output'];
+};
+
+export type IChatRoomEdge = {
+    __typename?: 'ChatRoomEdge';
+    cursor: Scalars['String']['output'];
+    node?: Maybe<IChatRoom>;
+};
+
+export type IChatRoomListInput = {
+    args?: InputMaybe<IPaginationInput>;
+    type?: InputMaybe<IChatRoomType>;
+    userId: Scalars['Int']['input'];
+};
+
+export enum IChatRoomType {
+    Group = 'group',
+    Private = 'private',
+}
+
+export type ICloseChatRoomInput = {
+    roomId: Scalars['Int']['input'];
+    userId: Scalars['Int']['input'];
+};
+
+export type ICreateChatRoomInput = {
+    members: Array<IChatMemberInput>;
+    name?: InputMaybe<Scalars['String']['input']>;
+    type: IChatRoomType;
+};
+
 export type ICreateUserInput = {
     avatarUrl?: InputMaybe<Scalars['Upload']['input']>;
     email: Scalars['String']['input'];
@@ -52,6 +145,17 @@ export type ICreateUserInput = {
     password: Scalars['String']['input'];
     role: Scalars['Int']['input'];
     story?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type IDeleteChatMessageInput = {
+    messageId: Scalars['ID']['input'];
+    userId: Scalars['Int']['input'];
+};
+
+export type IEditChatMessageInput = {
+    content: Scalars['String']['input'];
+    messageId: Scalars['ID']['input'];
+    userId: Scalars['Int']['input'];
 };
 
 export type IForgotPassword = {
@@ -64,42 +168,111 @@ export type IFriendRequest = {
     senderId: Scalars['Int']['output'];
 };
 
+export type ILeaveChatRoomInput = {
+    roomId: Scalars['Int']['input'];
+    userId: Scalars['Int']['input'];
+};
+
+export enum IMessageContentType {
+    Image = 'image',
+    Text = 'text',
+}
+
 export type IMutation = {
     __typename?: 'Mutation';
     ChangePassword: ISuccessResponse;
+    acceptFriend: ISuccessResponse;
     addFriend: ISuccessResponse;
+    add_chat_member: IChatRoom;
     block_user: ISuccessResponse;
+    close_chat_room: ISuccessResponse;
+    create_chat_room: IChatRoom;
+    /**
+     * #### Error Code:
+     *
+     * - `Unauthenticated`
+     * - `ChatMessageNotFound`
+     * - `NotPermitted`
+     */
+    delete_chat_message: ISuccessResponse;
     delete_user: ISuccessResponse;
+    edit_chat_message: IChatMessage;
     forgot_password: ISuccessResponse;
+    leave_chat_room: ISuccessResponse;
+    post_chat_message: IChatMessage;
     register: IUser;
+    /**
+     * #### Error Code:
+     *
+     * - `Unauthenticated`
+     * - `PlayerNotFound`
+     */
+    send_direct_message: ISuccessResponse;
     unFriend: ISuccessResponse;
     unblock_user: ISuccessResponse;
     upRoleUser: ISuccessResponse;
     updateUser: ISuccessResponse;
+    view_chat_messages: IChatMessageConnection;
 };
 
 export type IMutationChangePasswordArgs = {
     input: IChangePasswordInput;
 };
 
+export type IMutationAcceptFriendArgs = {
+    id: Scalars['ID']['input'];
+};
+
 export type IMutationAddFriendArgs = {
     email: Scalars['String']['input'];
+};
+
+export type IMutationAdd_Chat_MemberArgs = {
+    input: IAddChatMemberInput;
 };
 
 export type IMutationBlock_UserArgs = {
     id: Scalars['ID']['input'];
 };
 
+export type IMutationClose_Chat_RoomArgs = {
+    input: ICloseChatRoomInput;
+};
+
+export type IMutationCreate_Chat_RoomArgs = {
+    input: ICreateChatRoomInput;
+};
+
+export type IMutationDelete_Chat_MessageArgs = {
+    input: IDeleteChatMessageInput;
+};
+
 export type IMutationDelete_UserArgs = {
     id: Scalars['ID']['input'];
+};
+
+export type IMutationEdit_Chat_MessageArgs = {
+    input: IEditChatMessageInput;
 };
 
 export type IMutationForgot_PasswordArgs = {
     input: IForgotPassword;
 };
 
+export type IMutationLeave_Chat_RoomArgs = {
+    input: ILeaveChatRoomInput;
+};
+
+export type IMutationPost_Chat_MessageArgs = {
+    input: IPostChatMessageInput;
+};
+
 export type IMutationRegisterArgs = {
     input: ICreateUserInput;
+};
+
+export type IMutationSend_Direct_MessageArgs = {
+    input: ISendDirectMessageInput;
 };
 
 export type IMutationUnFriendArgs = {
@@ -118,6 +291,10 @@ export type IMutationUpdateUserArgs = {
     input: IUpdateUserInput;
 };
 
+export type IMutationView_Chat_MessagesArgs = {
+    input: IViewChatMessagesInput;
+};
+
 export type IPageInfo = {
     __typename?: 'PageInfo';
     endCursor?: Maybe<Scalars['Cursor']['output']>;
@@ -131,13 +308,36 @@ export type IPaginationInput = {
     last?: InputMaybe<Scalars['Int']['input']>;
 };
 
+export type IPostChatMessageInput = {
+    content: Scalars['String']['input'];
+    messageContentType?: InputMaybe<IMessageContentType>;
+    roomId: Scalars['Int']['input'];
+    userId: Scalars['Int']['input'];
+};
+
 export type IQuery = {
     __typename?: 'Query';
+    chat_room: IChatRoom;
+    chat_room_list: IChatRoomConnection;
+    get_chat_room_from_participant?: Maybe<IChatRoom>;
     listFriend?: Maybe<IList_All_Friend>;
     login: IUserLoginResponse;
     me: IUser;
     user: IUser;
     users?: Maybe<Array<Maybe<IUser>>>;
+};
+
+export type IQueryChat_RoomArgs = {
+    roomId: Scalars['Int']['input'];
+};
+
+export type IQueryChat_Room_ListArgs = {
+    input: IChatRoomListInput;
+};
+
+export type IQueryGet_Chat_Room_From_ParticipantArgs = {
+    isPrivate?: InputMaybe<Scalars['Boolean']['input']>;
+    participantIds: Array<Scalars['Int']['input']>;
 };
 
 export type IQueryLoginArgs = {
@@ -146,6 +346,12 @@ export type IQueryLoginArgs = {
 
 export type IQueryUserArgs = {
     id: Scalars['ID']['input'];
+};
+
+export type ISendDirectMessageInput = {
+    content: Scalars['String']['input'];
+    fromUserId: Scalars['Int']['input'];
+    toUserId: Scalars['Int']['input'];
 };
 
 export type ISubscription = {
@@ -205,6 +411,12 @@ export type IUserOnline = {
     __typename?: 'UserOnline';
     body?: Maybe<Scalars['String']['output']>;
     id?: Maybe<Scalars['Int']['output']>;
+};
+
+export type IViewChatMessagesInput = {
+    args?: InputMaybe<IPaginationInput>;
+    roomId: Scalars['Int']['input'];
+    userId: Scalars['Int']['input'];
 };
 
 export type IChangePasswordInput = {
@@ -339,19 +551,56 @@ export type DirectiveResolverFn<
 
 /** Mapping between all available schema types and the resolvers types */
 export type IResolversTypes = {
+    AddChatMemberInput: IAddChatMemberInput;
     Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
+    ChatMember: ResolverTypeWrapper<chat_members>;
+    ChatMemberInput: IChatMemberInput;
+    ChatMessage: ResolverTypeWrapper<
+        Omit<IChatMessage, 'posted_by'> & { posted_by: IResolversTypes['User'] }
+    >;
+    ChatMessageConnection: ResolverTypeWrapper<
+        Omit<IChatMessageConnection, 'edges'> & {
+            edges?: Maybe<Array<Maybe<IResolversTypes['ChatMessageEdge']>>>;
+        }
+    >;
+    ChatMessageEdge: ResolverTypeWrapper<
+        Omit<IChatMessageEdge, 'node'> & {
+            node?: Maybe<IResolversTypes['ChatMessage']>;
+        }
+    >;
+    ChatRoom: ResolverTypeWrapper<chat_room>;
+    ChatRoomConnection: ResolverTypeWrapper<
+        Omit<IChatRoomConnection, 'edges'> & {
+            edges?: Maybe<Array<Maybe<IResolversTypes['ChatRoomEdge']>>>;
+        }
+    >;
+    ChatRoomEdge: ResolverTypeWrapper<
+        Omit<IChatRoomEdge, 'node'> & {
+            node?: Maybe<IResolversTypes['ChatRoom']>;
+        }
+    >;
+    ChatRoomListInput: IChatRoomListInput;
+    ChatRoomType: IChatRoomType;
+    CloseChatRoomInput: ICloseChatRoomInput;
+    CreateChatRoomInput: ICreateChatRoomInput;
     CreateUserInput: ICreateUserInput;
     Cursor: ResolverTypeWrapper<Scalars['Cursor']['output']>;
     Date: ResolverTypeWrapper<Scalars['Date']['output']>;
+    DeleteChatMessageInput: IDeleteChatMessageInput;
+    EditChatMessageInput: IEditChatMessageInput;
     ForgotPassword: IForgotPassword;
     FriendRequest: ResolverTypeWrapper<IFriendRequest>;
     ID: ResolverTypeWrapper<Scalars['ID']['output']>;
     Int: ResolverTypeWrapper<Scalars['Int']['output']>;
     JSON: ResolverTypeWrapper<Scalars['JSON']['output']>;
+    LeaveChatRoomInput: ILeaveChatRoomInput;
+    MessageContentType: IMessageContentType;
     Mutation: ResolverTypeWrapper<{}>;
     PageInfo: ResolverTypeWrapper<IPageInfo>;
     PaginationInput: IPaginationInput;
+    PostChatMessageInput: IPostChatMessageInput;
     Query: ResolverTypeWrapper<{}>;
+    SendDirectMessageInput: ISendDirectMessageInput;
     String: ResolverTypeWrapper<Scalars['String']['output']>;
     Subscription: ResolverTypeWrapper<{}>;
     SuccessResponse: ISuccessResponse;
@@ -363,6 +612,7 @@ export type IResolversTypes = {
         Omit<IUserLoginResponse, 'user'> & { user: IResolversTypes['User'] }
     >;
     UserOnline: ResolverTypeWrapper<IUserOnline>;
+    ViewChatMessagesInput: IViewChatMessagesInput;
     changePasswordInput: IChangePasswordInput;
     list_Friend: ResolverTypeWrapper<IList_Friend>;
     list_all_friend: ResolverTypeWrapper<IList_All_Friend>;
@@ -370,19 +620,46 @@ export type IResolversTypes = {
 
 /** Mapping between all available schema types and the resolvers parents */
 export type IResolversParentTypes = {
+    AddChatMemberInput: IAddChatMemberInput;
     Boolean: Scalars['Boolean']['output'];
+    ChatMember: chat_members;
+    ChatMemberInput: IChatMemberInput;
+    ChatMessage: Omit<IChatMessage, 'posted_by'> & {
+        posted_by: IResolversParentTypes['User'];
+    };
+    ChatMessageConnection: Omit<IChatMessageConnection, 'edges'> & {
+        edges?: Maybe<Array<Maybe<IResolversParentTypes['ChatMessageEdge']>>>;
+    };
+    ChatMessageEdge: Omit<IChatMessageEdge, 'node'> & {
+        node?: Maybe<IResolversParentTypes['ChatMessage']>;
+    };
+    ChatRoom: chat_room;
+    ChatRoomConnection: Omit<IChatRoomConnection, 'edges'> & {
+        edges?: Maybe<Array<Maybe<IResolversParentTypes['ChatRoomEdge']>>>;
+    };
+    ChatRoomEdge: Omit<IChatRoomEdge, 'node'> & {
+        node?: Maybe<IResolversParentTypes['ChatRoom']>;
+    };
+    ChatRoomListInput: IChatRoomListInput;
+    CloseChatRoomInput: ICloseChatRoomInput;
+    CreateChatRoomInput: ICreateChatRoomInput;
     CreateUserInput: ICreateUserInput;
     Cursor: Scalars['Cursor']['output'];
     Date: Scalars['Date']['output'];
+    DeleteChatMessageInput: IDeleteChatMessageInput;
+    EditChatMessageInput: IEditChatMessageInput;
     ForgotPassword: IForgotPassword;
     FriendRequest: IFriendRequest;
     ID: Scalars['ID']['output'];
     Int: Scalars['Int']['output'];
     JSON: Scalars['JSON']['output'];
+    LeaveChatRoomInput: ILeaveChatRoomInput;
     Mutation: {};
     PageInfo: IPageInfo;
     PaginationInput: IPaginationInput;
+    PostChatMessageInput: IPostChatMessageInput;
     Query: {};
+    SendDirectMessageInput: ISendDirectMessageInput;
     String: Scalars['String']['output'];
     Subscription: {};
     UpdateUserInput: IUpdateUserInput;
@@ -393,9 +670,121 @@ export type IResolversParentTypes = {
         user: IResolversParentTypes['User'];
     };
     UserOnline: IUserOnline;
+    ViewChatMessagesInput: IViewChatMessagesInput;
     changePasswordInput: IChangePasswordInput;
     list_Friend: IList_Friend;
     list_all_friend: IList_All_Friend;
+};
+
+export type IChatMemberResolvers<
+    ContextType = any,
+    ParentType extends IResolversParentTypes['ChatMember'] = IResolversParentTypes['ChatMember']
+> = {
+    is_admin?: Resolver<IResolversTypes['Boolean'], ParentType, ContextType>;
+    user?: Resolver<IResolversTypes['User'], ParentType, ContextType>;
+    __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type IChatMessageResolvers<
+    ContextType = any,
+    ParentType extends IResolversParentTypes['ChatMessage'] = IResolversParentTypes['ChatMessage']
+> = {
+    content?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
+    id?: Resolver<IResolversTypes['ID'], ParentType, ContextType>;
+    messageContentType?: Resolver<
+        Maybe<IResolversTypes['MessageContentType']>,
+        ParentType,
+        ContextType
+    >;
+    posted_at?: Resolver<IResolversTypes['Date'], ParentType, ContextType>;
+    posted_by?: Resolver<IResolversTypes['User'], ParentType, ContextType>;
+    read_count?: Resolver<
+        Maybe<IResolversTypes['Int']>,
+        ParentType,
+        ContextType
+    >;
+    room_id?: Resolver<IResolversTypes['Int'], ParentType, ContextType>;
+    __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type IChatMessageConnectionResolvers<
+    ContextType = any,
+    ParentType extends IResolversParentTypes['ChatMessageConnection'] = IResolversParentTypes['ChatMessageConnection']
+> = {
+    edges?: Resolver<
+        Maybe<Array<Maybe<IResolversTypes['ChatMessageEdge']>>>,
+        ParentType,
+        ContextType
+    >;
+    pageInfo?: Resolver<IResolversTypes['PageInfo'], ParentType, ContextType>;
+    totalCount?: Resolver<IResolversTypes['Int'], ParentType, ContextType>;
+    __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type IChatMessageEdgeResolvers<
+    ContextType = any,
+    ParentType extends IResolversParentTypes['ChatMessageEdge'] = IResolversParentTypes['ChatMessageEdge']
+> = {
+    cursor?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
+    node?: Resolver<
+        Maybe<IResolversTypes['ChatMessage']>,
+        ParentType,
+        ContextType
+    >;
+    __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type IChatRoomResolvers<
+    ContextType = any,
+    ParentType extends IResolversParentTypes['ChatRoom'] = IResolversParentTypes['ChatRoom']
+> = {
+    id?: Resolver<IResolversTypes['Int'], ParentType, ContextType>;
+    members?: Resolver<
+        Array<IResolversTypes['ChatMember']>,
+        ParentType,
+        ContextType
+    >;
+    messages?: Resolver<
+        IResolversTypes['ChatMessageConnection'],
+        ParentType,
+        ContextType,
+        Partial<IChatRoomMessagesArgs>
+    >;
+    name?: Resolver<Maybe<IResolversTypes['String']>, ParentType, ContextType>;
+    type?: Resolver<IResolversTypes['ChatRoomType'], ParentType, ContextType>;
+    unread_count?: Resolver<
+        Maybe<IResolversTypes['Int']>,
+        ParentType,
+        ContextType
+    >;
+    __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type IChatRoomConnectionResolvers<
+    ContextType = any,
+    ParentType extends IResolversParentTypes['ChatRoomConnection'] = IResolversParentTypes['ChatRoomConnection']
+> = {
+    edges?: Resolver<
+        Maybe<Array<Maybe<IResolversTypes['ChatRoomEdge']>>>,
+        ParentType,
+        ContextType
+    >;
+    pageInfo?: Resolver<IResolversTypes['PageInfo'], ParentType, ContextType>;
+    totalCount?: Resolver<IResolversTypes['Int'], ParentType, ContextType>;
+    __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type IChatRoomEdgeResolvers<
+    ContextType = any,
+    ParentType extends IResolversParentTypes['ChatRoomEdge'] = IResolversParentTypes['ChatRoomEdge']
+> = {
+    cursor?: Resolver<IResolversTypes['String'], ParentType, ContextType>;
+    node?: Resolver<
+        Maybe<IResolversTypes['ChatRoom']>,
+        ParentType,
+        ContextType
+    >;
+    __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export interface ICursorScalarConfig
@@ -436,11 +825,23 @@ export type IMutationResolvers<
         ContextType,
         RequireFields<IMutationChangePasswordArgs, 'input'>
     >;
+    acceptFriend?: Resolver<
+        IResolversTypes['SuccessResponse'],
+        ParentType,
+        ContextType,
+        RequireFields<IMutationAcceptFriendArgs, 'id'>
+    >;
     addFriend?: Resolver<
         IResolversTypes['SuccessResponse'],
         ParentType,
         ContextType,
         RequireFields<IMutationAddFriendArgs, 'email'>
+    >;
+    add_chat_member?: Resolver<
+        IResolversTypes['ChatRoom'],
+        ParentType,
+        ContextType,
+        RequireFields<IMutationAdd_Chat_MemberArgs, 'input'>
     >;
     block_user?: Resolver<
         IResolversTypes['SuccessResponse'],
@@ -448,11 +849,35 @@ export type IMutationResolvers<
         ContextType,
         RequireFields<IMutationBlock_UserArgs, 'id'>
     >;
+    close_chat_room?: Resolver<
+        IResolversTypes['SuccessResponse'],
+        ParentType,
+        ContextType,
+        RequireFields<IMutationClose_Chat_RoomArgs, 'input'>
+    >;
+    create_chat_room?: Resolver<
+        IResolversTypes['ChatRoom'],
+        ParentType,
+        ContextType,
+        RequireFields<IMutationCreate_Chat_RoomArgs, 'input'>
+    >;
+    delete_chat_message?: Resolver<
+        IResolversTypes['SuccessResponse'],
+        ParentType,
+        ContextType,
+        RequireFields<IMutationDelete_Chat_MessageArgs, 'input'>
+    >;
     delete_user?: Resolver<
         IResolversTypes['SuccessResponse'],
         ParentType,
         ContextType,
         RequireFields<IMutationDelete_UserArgs, 'id'>
+    >;
+    edit_chat_message?: Resolver<
+        IResolversTypes['ChatMessage'],
+        ParentType,
+        ContextType,
+        RequireFields<IMutationEdit_Chat_MessageArgs, 'input'>
     >;
     forgot_password?: Resolver<
         IResolversTypes['SuccessResponse'],
@@ -460,11 +885,29 @@ export type IMutationResolvers<
         ContextType,
         RequireFields<IMutationForgot_PasswordArgs, 'input'>
     >;
+    leave_chat_room?: Resolver<
+        IResolversTypes['SuccessResponse'],
+        ParentType,
+        ContextType,
+        RequireFields<IMutationLeave_Chat_RoomArgs, 'input'>
+    >;
+    post_chat_message?: Resolver<
+        IResolversTypes['ChatMessage'],
+        ParentType,
+        ContextType,
+        RequireFields<IMutationPost_Chat_MessageArgs, 'input'>
+    >;
     register?: Resolver<
         IResolversTypes['User'],
         ParentType,
         ContextType,
         RequireFields<IMutationRegisterArgs, 'input'>
+    >;
+    send_direct_message?: Resolver<
+        IResolversTypes['SuccessResponse'],
+        ParentType,
+        ContextType,
+        RequireFields<IMutationSend_Direct_MessageArgs, 'input'>
     >;
     unFriend?: Resolver<
         IResolversTypes['SuccessResponse'],
@@ -490,6 +933,12 @@ export type IMutationResolvers<
         ContextType,
         RequireFields<IMutationUpdateUserArgs, 'input'>
     >;
+    view_chat_messages?: Resolver<
+        IResolversTypes['ChatMessageConnection'],
+        ParentType,
+        ContextType,
+        RequireFields<IMutationView_Chat_MessagesArgs, 'input'>
+    >;
 };
 
 export type IPageInfoResolvers<
@@ -509,6 +958,27 @@ export type IQueryResolvers<
     ContextType = any,
     ParentType extends IResolversParentTypes['Query'] = IResolversParentTypes['Query']
 > = {
+    chat_room?: Resolver<
+        IResolversTypes['ChatRoom'],
+        ParentType,
+        ContextType,
+        RequireFields<IQueryChat_RoomArgs, 'roomId'>
+    >;
+    chat_room_list?: Resolver<
+        IResolversTypes['ChatRoomConnection'],
+        ParentType,
+        ContextType,
+        RequireFields<IQueryChat_Room_ListArgs, 'input'>
+    >;
+    get_chat_room_from_participant?: Resolver<
+        Maybe<IResolversTypes['ChatRoom']>,
+        ParentType,
+        ContextType,
+        RequireFields<
+            IQueryGet_Chat_Room_From_ParticipantArgs,
+            'participantIds'
+        >
+    >;
     listFriend?: Resolver<
         Maybe<IResolversTypes['list_all_friend']>,
         ParentType,
@@ -665,6 +1135,13 @@ export type IList_All_FriendResolvers<
 };
 
 export type IResolvers<ContextType = any> = {
+    ChatMember?: IChatMemberResolvers<ContextType>;
+    ChatMessage?: IChatMessageResolvers<ContextType>;
+    ChatMessageConnection?: IChatMessageConnectionResolvers<ContextType>;
+    ChatMessageEdge?: IChatMessageEdgeResolvers<ContextType>;
+    ChatRoom?: IChatRoomResolvers<ContextType>;
+    ChatRoomConnection?: IChatRoomConnectionResolvers<ContextType>;
+    ChatRoomEdge?: IChatRoomEdgeResolvers<ContextType>;
     Cursor?: GraphQLScalarType;
     Date?: GraphQLScalarType;
     FriendRequest?: IFriendRequestResolvers<ContextType>;

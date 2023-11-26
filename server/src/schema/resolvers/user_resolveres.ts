@@ -435,26 +435,6 @@ const userResolver: IResolvers = {
                     if(check_FriendShip_history.RequesterId === user.id){
                         throw new Error(`${user_add.firstName  } ban da gui loi moi ket ban denb ho `);
                     }
-                    check_FriendShip_history.StatusCode = StatusFriend.Accepted;
-                    await sequelize.transaction(async (t) => {
-                        try{
-                            await check_FriendShip_history.save();
-                            await db.HistoryFriendShip.create({
-                                FriendshipID : check_FriendShip_history.Id,
-                                RequesterId: user_add.id,
-                                AddresseeId : user.id,
-                                StatusCode : StatusFriend.Accepted,
-                                SpecifierId : user.id
-                            },{
-                                transaction: t,
-                            });
-                        } catch (error) {
-                            await t.rollback();
-                            throw new MySQLError(
-                                `Lỗi bất thường khi thao tác trong cơ sở dữ liệu: ${error}`
-                            );
-                        }
-                    });
                 }
                 if(check_FriendShip_history.StatusCode === StatusFriend.Declined){
                     check_FriendShip_history.StatusCode = StatusFriend.Requested;
@@ -716,11 +696,68 @@ const userResolver: IResolvers = {
                 throw new Error('ban chua block nguoi nay');
             }
             return ISuccessResponse.Success;
+        },
+        acceptFriend : async (_parent , {id},context)=>{
+            checkAuthentication(context);
+            const {user} = context;
+            const user_accept = await db.users.findByPk(id,{
+            });
+            if(!user_accept){
+                throw new UserNotFoundError();
+            }
+            if(user.id === user_accept.id){
+                throw new UserNotFoundError('khong the tu goi cho chinh ban than ban');
+            }
+            const check_user_accept = await db.Friendship.findOne({
+                where: {
+                    [Op.or]: [
+                        {
+                            RequesterId: user.id,
+                            AddresseeId: user_accept.id,
+                        },
+                        {
+                            RequesterId: user_accept.id,
+                            AddresseeId: user.id,
+                        },
+                    ],
+                    SpecifierId : user_accept.id,
+                },
+            });
+            if(check_user_accept){
+                if(check_user_accept.StatusCode === StatusFriend.Requested){
+                    check_user_accept.StatusCode = StatusFriend.Accepted;
+                    await sequelize.transaction(async (t) => {
+                        try{
+                            await check_user_accept.save();
+                            await db.HistoryFriendShip.create({
+                                FriendshipID: check_user_accept.Id,
+                                RequesterId : check_user_accept.RequesterId,
+                                AddresseeId : check_user_accept.AddresseeId,
+                                StatusCode : StatusFriend.Accepted,
+                                SpecifierId : user.id
+                            },{
+                                transaction: t,
+                            });
+                        } catch (error) {
+                            await t.rollback();
+                            throw new MySQLError(
+                                `Lỗi bất thường khi thao tác trong cơ sở dữ liệu: ${error}`
+                            );
+                        }
+                    });
+                }else{
+                    throw new Error('ban khong the chap nhan loi moi ket ban ');
+                }
+            }else{
+                throw new Error('ho chua gui ket ban den ban');
+            }
+            return ISuccessResponse.Success;
         }
     },
 
     Subscription: {
         onlineTracker: {
+
             subscribe: (parent, { userId }) =>
                 pubsub_service.asyncIteratorByUser(
                     userId,

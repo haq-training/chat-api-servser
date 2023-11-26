@@ -6,6 +6,57 @@ schema {
     subscription: Subscription
 }
 
+type ChatMember {
+    is_admin: Boolean!
+    user: User!
+}
+
+type ChatMessage {
+    content: String!
+    id: ID!
+    messageContentType: MessageContentType
+    posted_at: Date!
+    posted_by: User!
+    """
+
+    Return number of read by another user for message send by own.
+    Return null if posted by another user.
+    """
+    read_count: Int
+    room_id: Int!
+}
+
+type ChatMessageConnection {
+    edges: [ChatMessageEdge]
+    pageInfo: PageInfo!
+    totalCount: Int!
+}
+
+type ChatMessageEdge {
+    cursor: String!
+    node: ChatMessage
+}
+
+type ChatRoom {
+    id: Int!
+    members: [ChatMember!]!
+    messages(input: PaginationInput): ChatMessageConnection!
+    name: String
+    type: ChatRoomType!
+    unread_count: Int
+}
+
+type ChatRoomConnection {
+    edges: [ChatRoomEdge]
+    pageInfo: PageInfo!
+    totalCount: Int!
+}
+
+type ChatRoomEdge {
+    cursor: String!
+    node: ChatRoom
+}
+
 type FriendRequest {
     message: String
     senderId: Int!
@@ -13,15 +64,40 @@ type FriendRequest {
 
 type Mutation {
     ChangePassword(input: changePasswordInput!): SuccessResponse!
+    acceptFriend(id: ID!): SuccessResponse!
     addFriend(email: String!): SuccessResponse!
+    add_chat_member(input: AddChatMemberInput!): ChatRoom!
     block_user(id: ID!): SuccessResponse!
+    close_chat_room(input: CloseChatRoomInput!): SuccessResponse!
+    create_chat_room(input: CreateChatRoomInput!): ChatRoom!
+    """
+
+    #### Error Code:
+
+    - `Unauthenticated`
+    - `ChatMessageNotFound`
+    - `NotPermitted`
+    """
+    delete_chat_message(input: DeleteChatMessageInput!): SuccessResponse!
     delete_user(id: ID!): SuccessResponse!
+    edit_chat_message(input: EditChatMessageInput!): ChatMessage!
     forgot_password(input: ForgotPassword!): SuccessResponse!
+    leave_chat_room(input: LeaveChatRoomInput!): SuccessResponse!
+    post_chat_message(input: PostChatMessageInput!): ChatMessage!
     register(input: CreateUserInput!): User!
+    """
+
+    #### Error Code:
+
+    - `Unauthenticated`
+    - `PlayerNotFound`
+    """
+    send_direct_message(input: SendDirectMessageInput!): SuccessResponse!
     unFriend(id: ID!): SuccessResponse!
     unblock_user(id: ID!): SuccessResponse!
     upRoleUser(id: ID!): SuccessResponse!
     updateUser(input: UpdateUserInput!): SuccessResponse!
+    view_chat_messages(input: ViewChatMessagesInput!): ChatMessageConnection!
 }
 
 type PageInfo {
@@ -30,6 +106,9 @@ type PageInfo {
 }
 
 type Query {
+    chat_room(roomId: Int!): ChatRoom!
+    chat_room_list(input: ChatRoomListInput!): ChatRoomConnection!
+    get_chat_room_from_participant(isPrivate: Boolean, participantIds: [Int!]!): ChatRoom
     listFriend: list_all_friend
     login(input: UserLoginInput!): UserLoginResponse!
     me: User!
@@ -83,6 +162,16 @@ type list_all_friend {
     friend: [list_Friend]
 }
 
+enum ChatRoomType {
+    group
+    private
+}
+
+enum MessageContentType {
+    image
+    text
+}
+
 enum SuccessResponse {
     success
 }
@@ -95,6 +184,33 @@ scalar JSON
 
 scalar Upload
 
+input AddChatMemberInput {
+    members: [ChatMemberInput!]!
+    roomId: Int!
+}
+
+input ChatMemberInput {
+    isAdmin: Boolean = false
+    userId: Int!
+}
+
+input ChatRoomListInput {
+    args: PaginationInput
+    type: ChatRoomType
+    userId: Int!
+}
+
+input CloseChatRoomInput {
+    roomId: Int!
+    userId: Int!
+}
+
+input CreateChatRoomInput {
+    members: [ChatMemberInput!]!
+    name: String
+    type: ChatRoomType!
+}
+
 input CreateUserInput {
     avatarUrl: Upload
     email: String!
@@ -106,8 +222,24 @@ input CreateUserInput {
     story: String
 }
 
+input DeleteChatMessageInput {
+    messageId: ID!
+    userId: Int!
+}
+
+input EditChatMessageInput {
+    content: String!
+    messageId: ID!
+    userId: Int!
+}
+
 input ForgotPassword {
     gmail: String!
+}
+
+input LeaveChatRoomInput {
+    roomId: Int!
+    userId: Int!
 }
 
 input PaginationInput {
@@ -115,6 +247,19 @@ input PaginationInput {
     before: Cursor
     first: Int
     last: Int
+}
+
+input PostChatMessageInput {
+    content: String!
+    messageContentType: MessageContentType
+    roomId: Int!
+    userId: Int!
+}
+
+input SendDirectMessageInput {
+    content: String!
+    fromUserId: Int!
+    toUserId: Int!
 }
 
 input UpdateUserInput {
@@ -129,6 +274,12 @@ input UpdateUserInput {
 input UserLoginInput {
     account: String!
     password: String!
+}
+
+input ViewChatMessagesInput {
+    args: PaginationInput
+    roomId: Int!
+    userId: Int!
 }
 
 input changePasswordInput {

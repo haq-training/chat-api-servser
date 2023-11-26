@@ -1,0 +1,152 @@
+enum ChatRoomType {
+    private
+    group
+}
+
+type ChatMember {
+    user: User!
+    is_admin: Boolean!
+}
+
+type ChatRoom {
+    id: Int!
+    type: ChatRoomType!
+    name: String
+    members: [ChatMember!]!
+    unread_count: Int
+    messages(input: PaginationInput): ChatMessageConnection!
+}
+
+type ChatRoomEdge {
+    cursor: String!
+    node: ChatRoom
+}
+
+type ChatRoomConnection {
+    edges: [ChatRoomEdge]
+    pageInfo: PageInfo!
+    totalCount: Int!
+}
+
+enum MessageContentType {
+    text
+    image
+}
+type ChatMessage {
+    id: ID!
+    room_id: Int!
+    posted_at: Date!
+    posted_by: User!
+    content: String!
+    messageContentType: MessageContentType
+    """
+    Return number of read by another user for message send by own.
+    Return null if posted by another user.
+    """
+    read_count: Int
+}
+
+type ChatMessageEdge {
+    cursor: String!
+    node: ChatMessage
+}
+type ChatMessageConnection {
+    edges: [ChatMessageEdge]
+    pageInfo: PageInfo!
+    totalCount: Int!
+}
+extend type Query {
+    chat_room_list(input: ChatRoomListInput!): ChatRoomConnection!
+
+    chat_room(roomId: Int!): ChatRoom!
+
+    get_chat_room_from_participant(participantIds: [Int!]! isPrivate: Boolean): ChatRoom
+}
+
+extend type Mutation {
+    create_chat_room(input: CreateChatRoomInput!): ChatRoom!
+
+    add_chat_member(input: AddChatMemberInput!): ChatRoom!
+
+    leave_chat_room(input: LeaveChatRoomInput!): SuccessResponse!
+
+    close_chat_room(input: CloseChatRoomInput!): SuccessResponse!
+
+    post_chat_message(input: PostChatMessageInput!): ChatMessage!
+
+    view_chat_messages(input: ViewChatMessagesInput!): ChatMessageConnection!
+
+    edit_chat_message(input: EditChatMessageInput!): ChatMessage!
+    """
+    #### Error Code:
+
+    - `Unauthenticated`
+    - `ChatMessageNotFound`
+    - `NotPermitted`
+    """
+    delete_chat_message(input: DeleteChatMessageInput!): SuccessResponse!
+    """
+    #### Error Code:
+
+    - `Unauthenticated`
+    - `PlayerNotFound`
+    """
+    send_direct_message(input: SendDirectMessageInput!): SuccessResponse!
+}
+
+input ChatMemberInput {
+    userId: Int!
+    isAdmin: Boolean = false
+}
+input CreateChatRoomInput {
+    type: ChatRoomType!
+    name: String
+    members: [ChatMemberInput!]!
+}
+input AddChatMemberInput {
+    roomId: Int!
+    members: [ChatMemberInput!]!
+}
+
+input LeaveChatRoomInput {
+    roomId: Int!
+    userId: Int!
+}
+input CloseChatRoomInput {
+    roomId: Int!
+    userId: Int!
+}
+
+input ChatRoomListInput {
+    userId: Int!
+    type: ChatRoomType
+    args: PaginationInput
+}
+input PostChatMessageInput {
+    roomId: Int!
+    userId: Int!
+    content: String!
+    messageContentType: MessageContentType
+}
+
+input ViewChatMessagesInput {
+    roomId: Int!
+    userId: Int!
+    args: PaginationInput
+}
+input EditChatMessageInput {
+    messageId: ID!
+    userId: Int!
+    content: String!
+}
+
+input DeleteChatMessageInput {
+    messageId: ID!
+    userId: Int!
+}
+
+input SendDirectMessageInput {
+    fromUserId: Int!
+    toUserId: Int!
+    content: String!
+}

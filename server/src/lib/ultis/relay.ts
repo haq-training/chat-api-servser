@@ -1,5 +1,6 @@
 /* eslint-disable linebreak-style */
 // import { Document, Query } from 'mongoose';
+// import {Query} from 'mongoose';
 import { IPaginationInput } from '../../__generated__/graphql';
 import { InvalidPaginationArgumentError } from '../classes/graphqlErrors';
 
@@ -119,7 +120,7 @@ export const convertRDBRowsToConnection = <T>(
 //     const MongooseQuery = query.toConstructor();
 //
 //     const totalCount = await new MongooseQuery().countDocuments();
-//     const [lastDoc] = await new MongooseQuery().sort(sortIdOpt).limit(1);
+//     const [lastDoc] : unknown = await new MongooseQuery().sort(sortIdOpt).limit(1);
 //     let lastCursor = lastDoc ? lastDoc.id : null;
 //
 //     const edgesQuery = new MongooseQuery().sort(sortOpt);

@@ -49,7 +49,7 @@ const addFriend = importGraphqlString('./mutations/addFriend/addFriend.graphql')
 const unFriend = importGraphqlString('./mutations/unFriend/unFriend.graphql');
 const block_user = importGraphqlString('./mutations/block_user/block_user.graphql');
 const unblock_user = importGraphqlString('./mutations/unblock_user/unblock_user.graphql');
-
+const acceptFriend = importGraphqlString('./mutations/acceptFriend/acceptFriend.graphql');
 export const queryExample = async (
     path: string = defaultPath
 ): Promise<Tab[]> => {
@@ -156,6 +156,13 @@ export const queryExample = async (
             name: 'unblock',
             query: unblock_user,
             variables: prettifyJsonString(variables.unblock_user),
+            headers: userAuth,
+        },
+        {
+            endpoint: path,
+            name: 'acceptFriend',
+            query: acceptFriend,
+            variables: prettifyJsonString(variables.acceptFriend),
             headers: userAuth,
         },
     ];

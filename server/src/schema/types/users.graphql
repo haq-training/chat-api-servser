@@ -17,6 +17,7 @@ extend type Mutation {
     forgot_password(input : ForgotPassword!):SuccessResponse!
     block_user(id:ID!):SuccessResponse!
     unblock_user(id:ID!):SuccessResponse!
+    acceptFriend(id:ID!) : SuccessResponse!
 }
 
 extend type Subscription {

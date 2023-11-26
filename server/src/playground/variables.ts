@@ -70,6 +70,9 @@ export const variables = {
     unblock_user: {
         id : 7,
     },
+    acceptFriend :{
+        id : 2,
+    }
 
 
 

@@ -1,0 +1,51 @@
+query ChatRoomList($input: ChatRoomListInput!) {
+    chat_room_list(input: $input) {
+        totalCount
+        pageInfo {
+            hasNextPage
+            endCursor
+        }
+        edges {
+            cursor
+            node {
+                id
+                type
+                name
+                unread_count
+                members {
+                    is_admin
+                    user {
+                        id
+                        lastName
+                        firstName
+                        email
+                        avatarUrl
+                    }
+                }
+                messages {
+                    totalCount
+                    pageInfo {
+                        hasNextPage
+                        endCursor
+                    }
+                    edges {
+                        cursor
+                        node {
+                            id
+                            posted_by {
+                                id
+                                firstName
+                                lastName
+                                email
+                                avatarUrl
+                            }
+                            posted_at
+                            content
+                            read_count
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

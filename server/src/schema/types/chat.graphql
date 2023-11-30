@@ -13,6 +13,10 @@ type ChatRoom {
     type: ChatRoomType!
     name: String
     members: [ChatMember!]!
+    """
+    Return count number only if ran chat_room_list query.
+    Otherwise return null.
+    """
     unread_count: Int
     messages(input: PaginationInput): ChatMessageConnection!
 }
@@ -32,6 +36,7 @@ enum MessageContentType {
     text
     image
 }
+
 type ChatMessage {
     id: ID!
     room_id: Int!
@@ -50,11 +55,13 @@ type ChatMessageEdge {
     cursor: String!
     node: ChatMessage
 }
+
 type ChatMessageConnection {
     edges: [ChatMessageEdge]
     pageInfo: PageInfo!
     totalCount: Int!
 }
+
 extend type Query {
     chat_room_list(input: ChatRoomListInput!): ChatRoomConnection!
 
@@ -98,11 +105,13 @@ input ChatMemberInput {
     userId: Int!
     isAdmin: Boolean = false
 }
+
 input CreateChatRoomInput {
     type: ChatRoomType!
     name: String
     members: [ChatMemberInput!]!
 }
+
 input AddChatMemberInput {
     roomId: Int!
     members: [ChatMemberInput!]!
@@ -122,6 +131,7 @@ input ChatRoomListInput {
     type: ChatRoomType
     args: PaginationInput
 }
+
 input PostChatMessageInput {
     roomId: Int!
     userId: Int!

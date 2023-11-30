@@ -11,7 +11,7 @@ export interface chat_membersAttributes {
   status: number;
   createdAt?: Date;
   updatedAt?: Date;
-  lastViewMsg?: Date;
+  lastViewMsg?: string;
 }
 
 export type chat_membersPk = 'id';
@@ -34,7 +34,7 @@ export class chat_members extends Model<chat_membersAttributes, chat_membersCrea
 
   updatedAt?: Date;
 
-  lastViewMsg?: Date;
+  lastViewMsg?: string;
 
   // chat_members belongsTo chat_room via chatRoomId
   chatRoom!: chat_room;
@@ -87,7 +87,7 @@ export class chat_members extends Model<chat_membersAttributes, chat_membersCrea
       allowNull: false
     },
     lastViewMsg: {
-      type: DataTypes.DATE,
+      type: DataTypes.STRING,
       allowNull: true
     }
   }, {

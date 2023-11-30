@@ -13,3 +13,6 @@ generates:
         ChatRoom: ../db_models/init-models#chat_room
         ChatMember: ../db_models/init-models#chat_members
         file : ../db_models/init-models#file
+        ChatMessage: ../mongodb_models/chatMessage#IChatMessageModel
+        ChatRoomEdge: ../db_models/chat_room#ChatRoomEdge
+        ChatRoomConnection: ../db_models/chat_room#ChatRoomConnection

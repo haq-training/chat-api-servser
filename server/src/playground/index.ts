@@ -50,6 +50,7 @@ const unFriend = importGraphqlString('./mutations/unFriend/unFriend.graphql');
 const block_user = importGraphqlString('./mutations/block_user/block_user.graphql');
 const unblock_user = importGraphqlString('./mutations/unblock_user/unblock_user.graphql');
 const acceptFriend = importGraphqlString('./mutations/acceptFriend/acceptFriend.graphql');
+const chatRoomList = importGraphqlString('./queries/chat_room_list/chat_room_list.graphql');
 export const queryExample = async (
     path: string = defaultPath
 ): Promise<Tab[]> => {
@@ -163,6 +164,13 @@ export const queryExample = async (
             name: 'acceptFriend',
             query: acceptFriend,
             variables: prettifyJsonString(variables.acceptFriend),
+            headers: userAuth,
+        },
+        {
+            endpoint: path,
+            name: 'Chat Room List',
+            query: chatRoomList,
+            variables: prettifyJsonString(variables.chatRoomList),
             headers: userAuth,
         },
     ];

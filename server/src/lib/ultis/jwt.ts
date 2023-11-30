@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { app } from '../../config/appConfig';
-import {UserNotFoundError} from '../classes/graphqlErrors';
+
 
 export interface USER_JWT {
     id: number;

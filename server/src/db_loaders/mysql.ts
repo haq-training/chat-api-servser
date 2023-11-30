@@ -5,6 +5,8 @@ import { initModels } from '../db_models/init-models';
 import users from '../test_data/users.json';
 import friendShip from '../test_data/friendShip.json';
 import historyFriendShip from '../test_data/historyFriendShip.json';
+import chat_room_date from '../test_data/chat_room.json';
+import chat_members from '../test_data/chat_member.json';
 
 export const sequelize = new Sequelize(
     database.MYSQL.db_name,
@@ -34,6 +36,8 @@ export const syncDatabase = async () => {
                     await models.users.bulkCreate(users as any);
                     await models.Friendship.bulkCreate(friendShip as any);
                     await models.HistoryFriendShip.bulkCreate(historyFriendShip as any);
+                    await models.chat_room.bulkCreate(chat_room_date as any);
+                    await models.chat_members.bulkCreate(chat_members as any);
                 }
             })
             .catch((err) => {

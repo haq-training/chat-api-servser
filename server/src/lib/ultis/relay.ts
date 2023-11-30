@@ -1,8 +1,6 @@
 /* eslint-disable linebreak-style */
-// import { Document, Query } from 'mongoose';
-// import {Query} from 'mongoose';
+import { Document, Query } from 'mongoose';
 import { IPaginationInput } from '../../__generated__/graphql';
-import { InvalidPaginationArgumentError } from '../classes/graphqlErrors';
 
 export type TPageInfo = {
     hasNextPage: boolean;
@@ -44,12 +42,12 @@ export const getRDBPaginationParams = (
 ) => {
     const { first, last, before, after } = input || defaultPaginationInput;
     if (first !== undefined && first !== null && first < 1) {
-        throw new InvalidPaginationArgumentError(
+        throw new Error(
             `'first' argument must be greater than 0 but ${first}`
         );
     }
     if (last !== undefined && last !== null && last < 1) {
-        throw new InvalidPaginationArgumentError(
+        throw new Error(
             `'last' argument must be greater than 0 but ${last}`
         );
     }
@@ -94,93 +92,91 @@ export const convertRDBRowsToConnection = <T>(
     };
 };
 
-// export const getConnectionFromQuery = async <T extends Document>(
-//     query: Query<T[], T>,
-//     pagination: IPaginationInput | null | undefined
-// ): Promise<TMongoConnection<T>> => {
-//     const defaultLimit = 10;
-//     const { first, last, before, after } = pagination || defaultPaginationInput;
-//
-//     if (first !== undefined && first !== null && first < 1) {
-//         throw new InvalidPaginationArgumentError(
-//             `'first' argument must be greater than 0 but ${first}`
-//         );
-//     }
-//     if (last !== undefined && last !== null && last < 1) {
-//         throw new InvalidPaginationArgumentError(
-//             `'last' argument must be greater than 0 but ${last}`
-//         );
-//     }
-//
-//     const sortOpt = query.getOptions().sort;
-//     const sortIdOpt =
-//         // eslint-disable-next-line no-underscore-dangle
-//         sortOpt && sortOpt._id && sortOpt._id === -1 ? '_id' : '-_id';
-//
-//     const MongooseQuery = query.toConstructor();
-//
-//     const totalCount = await new MongooseQuery().countDocuments();
-//     const [lastDoc] : unknown = await new MongooseQuery().sort(sortIdOpt).limit(1);
-//     let lastCursor = lastDoc ? lastDoc.id : null;
-//
-//     const edgesQuery = new MongooseQuery().sort(sortOpt);
-//
-//     if (last) {
-//         edgesQuery.sort(sortIdOpt);
-//     }
-//
-//     // Using 'as any' because mongoose type definition is weird
-//     // ObjectId is available but input type is only number in gt and lt method
-//     if (before) {
-//         const limit = last || first || defaultLimit;
-//         if (sortIdOpt === '_id') {
-//             edgesQuery
-//                 .where('_id')
-//                 .gt(before as any)
-//                 .limit(limit);
-//         } else {
-//             edgesQuery
-//                 .where('_id')
-//                 .lt(before as any)
-//                 .limit(limit);
-//         }
-//     } else if (after) {
-//         const limit = last || first || defaultLimit;
-//         if (sortIdOpt === '_id') {
-//             edgesQuery
-//                 .where('_id')
-//                 .lt(after as any)
-//                 .limit(limit);
-//         } else {
-//             edgesQuery
-//                 .where('_id')
-//                 .gt(after as any)
-//                 .limit(limit);
-//         }
-//     } else {
-//         const limit = last || first || defaultLimit;
-//         edgesQuery.limit(limit);
-//     }
-//
-//     const edges = await edgesQuery.exec();
-//
-//     const sortedEdges = last ? edges.reverse() : edges;
-//     const endCursor =
-//         sortedEdges.length < 1 ? null : sortedEdges.slice(-1)[0].id;
-//
-//     if (before && last) {
-//         lastCursor = endCursor;
-//     }
-//
-//     return {
-//         totalCount,
-//         edges: sortedEdges,
-//         pageInfo: {
-//             endCursor,
-//             hasNextPage: totalCount < 1 ? false : endCursor !== lastCursor,
-//         },
-//     };
-// };
+export const getConnectionFromQuery = async <T extends Document>(
+    query: Query<T[], T>,
+    pagination: IPaginationInput | null | undefined
+): Promise<TMongoConnection<T>> => {
+    const defaultLimit = 10;
+    const { first, last, before, after } = pagination || defaultPaginationInput;
+
+    if (first !== undefined && first !== null && first < 1) {
+        throw new Error(
+            `'first' argument must be greater than 0 but ${first}`
+        );
+    }
+    if (last !== undefined && last !== null && last < 1) {
+        throw new Error(
+            `'last' argument must be greater than 0 but ${last}`
+        );
+    }
+
+    const sortOpt = query.getOptions().sort;
+    const sortIdOpt =
+        // eslint-disable-next-line no-underscore-dangle
+        sortOpt && sortOpt._id && sortOpt._id === -1 ? '_id' : '-_id';
+
+    const MongooseQuery = query.toConstructor();
+
+    const totalCount = await new MongooseQuery().countDocuments();
+    const [lastDoc] : any = await new MongooseQuery().sort(sortIdOpt).limit(1);
+    let lastCursor = lastDoc ? lastDoc.id : null;
+
+    const edgesQuery = new MongooseQuery().sort(sortOpt);
+
+    if (last) {
+        edgesQuery.sort(sortIdOpt);
+    }
+
+    // Using 'as any' because mongoose type definition is weird
+    // ObjectId is available but input type is only number in gt and lt method
+    if (before) {
+        const limit = last || first || defaultLimit;
+        if (sortIdOpt === '_id') {
+            edgesQuery
+                .where('_id')
+                .gt(before as any)
+                .limit(limit);
+        } else {
+            edgesQuery
+                .where('_id')
+                .lt(before as any)
+                .limit(limit);
+        }
+    } else if (after) {
+        const limit = last || first || defaultLimit;
+        if (sortIdOpt === '_id') {
+            edgesQuery
+                .where('_id')
+                .lt(after as any)
+                .limit(limit);
+        } else {
+            edgesQuery
+                .where('_id')
+                .gt(after as any)
+                .limit(limit);
+        }
+    } else {
+        const limit = last || first || defaultLimit;
+        edgesQuery.limit(limit);
+    }
+
+    const edges : any = await edgesQuery.exec();
+    const sortedEdges = last ? edges.reverse() : edges;
+    const endCursor = sortedEdges.length < 1 ? null : sortedEdges.slice(-1)[0].id;
+
+    if (before && last) {
+        lastCursor = endCursor;
+    }
+
+    return {
+        totalCount,
+        edges: sortedEdges,
+        pageInfo: {
+            endCursor,
+            hasNextPage: totalCount < 1 ? false : endCursor !== lastCursor,
+        },
+    };
+};
 
 export const rdbConnectionResolver = {
     edges: (parent: TRDBConnection) => parent.rows,

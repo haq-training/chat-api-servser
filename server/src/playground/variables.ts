@@ -1,8 +1,11 @@
+import { IChatRoomType } from '../__generated__/graphql';
+
 const account = 'dvc123@gmail.com';
 const password = '123456';
 
 const userForLogin = 'userdemo@gmail.com';
 const passwordForLogin = '123456';
+
 
 export const variables = {
     login: {
@@ -72,7 +75,13 @@ export const variables = {
     },
     acceptFriend :{
         id : 2,
-    }
+    },
+    chatRoomList: {
+        input: {
+            userId: 1,
+            type: IChatRoomType.Private,
+        },
+    },
 
 
 

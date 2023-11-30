@@ -4,6 +4,8 @@ import {
     GraphQLScalarTypeConfig,
 } from 'graphql';
 import { users, chat_room, chat_members, file } from '../db_models/init-models';
+import { IChatMessageModel } from '../mongodb_models/chatMessage';
+import { ChatRoomEdge, ChatRoomConnection } from '../db_models/chat_room';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = {
@@ -53,6 +55,22 @@ export type IChatMember = {
     is_admin: Scalars['Boolean']['output'];
     user: IUser;
 };
+export enum IStatus {
+    Ready = 'Ready',
+    Assignee = 'Assignee',
+    InProgress = 'InProgress',
+    Waiting = 'Waiting',
+    WaitApprove = 'WaitApprove',
+    Reject = 'Reject',
+    Cancel = 'Cancel',
+    Completed = 'Completed',
+}
+export enum ILevel {
+    One = 'One',
+    Two = 'Two',
+    Three = 'Three',
+    Four = 'Four',
+}
 
 export type IChatMemberInput = {
     isAdmin?: InputMaybe<Scalars['Boolean']['input']>;
@@ -94,6 +112,10 @@ export type IChatRoom = {
     messages: IChatMessageConnection;
     name?: Maybe<Scalars['String']['output']>;
     type: IChatRoomType;
+    /**
+     * Return count number only if ran chat_room_list query.
+     * Otherwise return null.
+     */
     unread_count?: Maybe<Scalars['Int']['output']>;
 };
 
@@ -555,9 +577,7 @@ export type IResolversTypes = {
     Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
     ChatMember: ResolverTypeWrapper<chat_members>;
     ChatMemberInput: IChatMemberInput;
-    ChatMessage: ResolverTypeWrapper<
-        Omit<IChatMessage, 'posted_by'> & { posted_by: IResolversTypes['User'] }
-    >;
+    ChatMessage: ResolverTypeWrapper<IChatMessageModel>;
     ChatMessageConnection: ResolverTypeWrapper<
         Omit<IChatMessageConnection, 'edges'> & {
             edges?: Maybe<Array<Maybe<IResolversTypes['ChatMessageEdge']>>>;
@@ -569,16 +589,8 @@ export type IResolversTypes = {
         }
     >;
     ChatRoom: ResolverTypeWrapper<chat_room>;
-    ChatRoomConnection: ResolverTypeWrapper<
-        Omit<IChatRoomConnection, 'edges'> & {
-            edges?: Maybe<Array<Maybe<IResolversTypes['ChatRoomEdge']>>>;
-        }
-    >;
-    ChatRoomEdge: ResolverTypeWrapper<
-        Omit<IChatRoomEdge, 'node'> & {
-            node?: Maybe<IResolversTypes['ChatRoom']>;
-        }
-    >;
+    ChatRoomConnection: ResolverTypeWrapper<ChatRoomConnection>;
+    ChatRoomEdge: ResolverTypeWrapper<ChatRoomEdge>;
     ChatRoomListInput: IChatRoomListInput;
     ChatRoomType: IChatRoomType;
     CloseChatRoomInput: ICloseChatRoomInput;
@@ -624,9 +636,7 @@ export type IResolversParentTypes = {
     Boolean: Scalars['Boolean']['output'];
     ChatMember: chat_members;
     ChatMemberInput: IChatMemberInput;
-    ChatMessage: Omit<IChatMessage, 'posted_by'> & {
-        posted_by: IResolversParentTypes['User'];
-    };
+    ChatMessage: IChatMessageModel;
     ChatMessageConnection: Omit<IChatMessageConnection, 'edges'> & {
         edges?: Maybe<Array<Maybe<IResolversParentTypes['ChatMessageEdge']>>>;
     };
@@ -634,12 +644,8 @@ export type IResolversParentTypes = {
         node?: Maybe<IResolversParentTypes['ChatMessage']>;
     };
     ChatRoom: chat_room;
-    ChatRoomConnection: Omit<IChatRoomConnection, 'edges'> & {
-        edges?: Maybe<Array<Maybe<IResolversParentTypes['ChatRoomEdge']>>>;
-    };
-    ChatRoomEdge: Omit<IChatRoomEdge, 'node'> & {
-        node?: Maybe<IResolversParentTypes['ChatRoom']>;
-    };
+    ChatRoomConnection: ChatRoomConnection;
+    ChatRoomEdge: ChatRoomEdge;
     ChatRoomListInput: IChatRoomListInput;
     CloseChatRoomInput: ICloseChatRoomInput;
     CreateChatRoomInput: ICreateChatRoomInput;
